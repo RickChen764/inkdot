@@ -562,6 +562,7 @@ ParseResult MarkdownParser::parseFile(const std::string& path) {
 std::string elementTypeToString(ElementType type) {
     switch (type) {
         case ElementType::Document: return "Document";
+        case ElementType::FrontMatter: return "FrontMatter";
         case ElementType::Paragraph: return "Paragraph";
         case ElementType::Heading: return "Heading";
         case ElementType::CodeBlock: return "CodeBlock";

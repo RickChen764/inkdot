@@ -67,6 +67,7 @@ It's a viewer first: perfect as the double-click default for `.md` and `.mmd` fi
 - **Word wrap** - Optional soft wrap in the editor (Ctrl+W)
 - **Focused editing** - Hide the preview pane while writing (Ctrl+P)
 - **Native Mermaid flowcharts** - Render `.mmd` files and fenced `mermaid` blocks without a web engine
+- **YAML Front Matter** - Render document metadata as a native card instead of leaking it into the page
 - **Rich tables** - Tables with bold, italic, code, and clickable links in cells
 - **Folder browser** - Press B to browse and open Markdown or Mermaid files
 - **Table of contents** - Press Tab to see document headings, click to jump
@@ -150,6 +151,22 @@ This registers `.md`, `.markdown`, and `.mmd` so you can select Tinta as their d
 ## Mermaid Support
 
 Tinta natively renders Mermaid `flowchart` and `graph` diagrams in `.mmd` files and fenced `mermaid` code blocks. It supports TB/TD, BT, LR, and RL layouts; common node shapes; directed and labeled edges; `classDef`, `class`, and `style` styling. Unsupported Mermaid diagram families fall back to readable source code.
+
+## YAML Front Matter
+
+Markdown files beginning with a YAML Front Matter block render their metadata in a compact, theme-aware card:
+
+```yaml
+---
+title: Project notes
+tags: [markdown, Windows]
+author:
+  name: Ada
+draft: false
+---
+```
+
+The built-in lightweight parser supports the Front Matter syntax used by most static-site generators and note apps: mappings, lists, nested values, flow collections, quoted strings, comments, and `|`/`>` multiline text. It adds no runtime dependency. Invalid metadata is shown with a readable error while the Markdown body still renders and remains editable.
 
 ## Themes
 

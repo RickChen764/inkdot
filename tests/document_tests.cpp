@@ -116,6 +116,38 @@ int main() {
           markdown.root->children[0]->type == qmd::ElementType::Heading,
           ".md content keeps Markdown parsing");
 
+    // YAML Front Matter becomes a metadata card and does not leak into the
+    // Markdown body. Source offsets remain relative to the original file so
+    // editor/preview scroll sync continues to work.
+    std::string yamlSource =
+        "---\n"
+        "title: Test document\n"
+        "tags: [one, two]\n"
+        "---\n"
+        "# Body heading\n";
+    auto yaml = parseDocument(parser, yamlSource, "notes.md");
+    check(yaml.success && yaml.root && yaml.root->children.size() == 2,
+          "front matter card and Markdown body are both created");
+    if (yaml.success && yaml.root && yaml.root->children.size() == 2) {
+        const auto& card = yaml.root->children[0];
+        const auto& body = yaml.root->children[1];
+        check(card->type == qmd::ElementType::FrontMatter,
+              "front matter becomes its own renderable element");
+        check(card->metadata.size() == 2 && card->metadata[0].first == "title",
+              "parsed metadata fields are attached to the card");
+        check(body->type == qmd::ElementType::Heading,
+              "body starts with the real Markdown heading");
+        check(body->sourceOffset >= yamlSource.find("Body heading"),
+              "body source offsets are shifted to the original document");
+    }
+
+    auto brokenYaml = parseDocument(parser,
+        "---\ntags: [one, two\n---\n# Body\n", "notes.md");
+    check(brokenYaml.success && brokenYaml.root &&
+          brokenYaml.root->children[0]->type == qmd::ElementType::FrontMatter &&
+          !brokenYaml.root->children[0]->error.empty(),
+          "invalid YAML is a visible card error, not a document load failure");
+
     if (failures != 0) {
         std::cerr << failures << " test(s) failed\n";
         return 1;

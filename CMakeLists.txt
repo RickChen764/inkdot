@@ -50,6 +50,7 @@ set(SOURCES
     src/mermaid.cpp
     src/document.cpp
     src/inline_style.cpp
+    src/front_matter.cpp
 )
 
 set(HEADERS
@@ -69,6 +70,7 @@ set(HEADERS
     include/mermaid.h
     include/document.h
     include/inline_style.h
+    include/front_matter.h
 )
 
 # Windows resource file (icon)
@@ -115,6 +117,7 @@ if(BUILD_TESTING)
         tests/document_tests.cpp
         src/document.cpp
         src/markdown.cpp
+        src/front_matter.cpp
     )
     target_include_directories(document_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -122,6 +125,15 @@ if(BUILD_TESTING)
     )
     target_link_libraries(document_tests PRIVATE md4c)
     add_test(NAME document_types COMMAND document_tests)
+
+    add_executable(front_matter_tests
+        tests/front_matter_tests.cpp
+        src/front_matter.cpp
+    )
+    target_include_directories(front_matter_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+    add_test(NAME front_matter_parser COMMAND front_matter_tests)
 
     add_executable(inline_style_tests
         tests/inline_style_tests.cpp

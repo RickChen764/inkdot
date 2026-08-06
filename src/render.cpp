@@ -742,6 +742,111 @@ static void layoutHeading(App& app, const ElementPtr& elem, float& y, float inde
     y += 12 * scale;
 }
 
+static std::vector<ElementPtr> plainTextElements(const std::string& text) {
+    auto element = std::make_shared<Element>(ElementType::Text);
+    element->text = text;
+    return {std::move(element)};
+}
+
+static void layoutPlainLines(App& app, const std::string& text,
+                             float x, float& y, float width,
+                             IDWriteTextFormat* format, D2D1_COLOR_F color,
+                             float lineHeight) {
+    size_t start = 0;
+    while (start <= text.size()) {
+        size_t end = text.find('\n', start);
+        if (end == std::string::npos) end = text.size();
+        if (end > start) {
+            layoutInlineContent(app, plainTextElements(text.substr(start, end - start)),
+                                x, y, width, format, color, {}, lineHeight);
+        } else {
+            y += lineHeight;
+        }
+        if (end == text.size()) break;
+        start = end + 1;
+    }
+}
+
+static void layoutFrontMatter(App& app, const ElementPtr& elem,
+                              float& y, float indent, float maxWidth) {
+    float scale = app.contentScale * app.zoomFactor;
+    float padding = 14.0f * scale;
+    float lineHeight = app.textFormat->GetFontSize() * 1.55f;
+    float titleHeight = lineHeight + 8.0f * scale;
+    float cardTop = y;
+    float contentX = indent + padding;
+    float contentWidth = std::max(40.0f * scale, maxWidth - padding * 2.0f);
+
+    D2D1_COLOR_F fill = app.theme.codeBackground;
+    fill.a = app.theme.isDark ? 0.52f : 0.66f;
+    D2D1_COLOR_F border = app.theme.blockquoteBorder;
+    border.a = 0.75f;
+    D2D1_COLOR_F muted = app.theme.text;
+    muted.a = 0.72f;
+
+    std::wstring title = L"YAML Front Matter";
+    LayoutInfo titleLayout = createLayout(
+        app, title, app.boldFormat, titleHeight, app.bodyTypography);
+    addTextRun(app, std::move(titleLayout), D2D1::Point2F(contentX, y + padding),
+               D2D1::RectF(contentX, y + padding,
+                           contentX + contentWidth, y + padding + titleHeight),
+               app.theme.accent, 0, 0, false);
+    y += padding + titleHeight;
+
+    if (!elem->error.empty()) {
+        D2D1_COLOR_F errorColor = hexColor(app.theme.isDark ? 0xF85149 : 0xCF222E);
+        layoutPlainLines(app, "YAML error: " + elem->error,
+                         contentX, y, contentWidth, app.boldFormat, errorColor, lineHeight);
+        if (!elem->text.empty()) {
+            y += 5.0f * scale;
+            layoutPlainLines(app, elem->text, contentX, y, contentWidth,
+                             app.codeFormat, muted, lineHeight);
+        }
+    } else if (elem->metadata.empty()) {
+        layoutPlainLines(app, "No metadata fields", contentX, y, contentWidth,
+                         app.italicFormat, muted, lineHeight);
+    } else {
+        float keyWidth = std::min(180.0f * scale, contentWidth * 0.30f);
+        keyWidth = std::max(88.0f * scale, keyWidth);
+        float valueX = contentX + keyWidth + 12.0f * scale;
+        float valueWidth = std::max(40.0f * scale, contentX + contentWidth - valueX);
+
+        for (size_t i = 0; i < elem->metadata.size(); i++) {
+            const auto& field = elem->metadata[i];
+            float keyY = y;
+            layoutPlainLines(app, field.first, contentX, keyY, keyWidth,
+                             app.boldFormat, app.theme.heading, lineHeight);
+            float valueY = y;
+            std::string value = field.second.empty() ? "\xE2\x80\x94" : field.second;
+            layoutPlainLines(app, value, valueX, valueY, valueWidth,
+                             app.textFormat, app.theme.text, lineHeight);
+            y = std::max(keyY, valueY) + 5.0f * scale;
+
+            if (i + 1 < elem->metadata.size()) {
+                D2D1_COLOR_F separator = border;
+                separator.a *= 0.5f;
+                app.layoutLines.push_back({
+                    D2D1::Point2F(contentX, y),
+                    D2D1::Point2F(contentX + contentWidth, y),
+                    separator, 1.0f * scale});
+                y += 6.0f * scale;
+            }
+        }
+    }
+
+    y += padding;
+    App::LayoutShape card;
+    card.type = App::LayoutShapeType::RoundedRectangle;
+    card.rect = D2D1::RectF(indent, cardTop, indent + maxWidth, y);
+    card.fill = fill;
+    card.stroke = border;
+    card.strokeWidth = 1.0f * scale;
+    card.radius = 8.0f * scale;
+    app.layoutShapes.push_back(std::move(card));
+    app.docText += L"\n";
+    y += 16.0f * scale;
+}
+
 static LayoutInfo createWrappedLayout(App& app, std::wstring_view text,
                                       IDWriteTextFormat* format,
                                       float width, float height) {
@@ -1944,6 +2049,9 @@ static void layoutElement(App& app, const ElementPtr& elem, float& y, float inde
     if (!elem) return;
 
     switch (elem->type) {
+        case ElementType::FrontMatter:
+            layoutFrontMatter(app, elem, y, indent, maxWidth);
+            break;
         case ElementType::Paragraph:
             layoutParagraph(app, elem, y, indent, maxWidth);
             break;
@@ -1995,6 +2103,7 @@ static void layoutElement(App& app, const ElementPtr& elem, float& y, float inde
             };
             for (const auto& child : elem->children) {
                 bool isBlock = (child->type == ElementType::Paragraph ||
+                                child->type == ElementType::FrontMatter ||
                                 child->type == ElementType::Heading ||
                                 child->type == ElementType::CodeBlock ||
                                 child->type == ElementType::BlockQuote ||

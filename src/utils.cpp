@@ -250,6 +250,15 @@ void extractText(const ElementPtr& elem, std::wstring& out) {
     if (!elem) return;
 
     switch (elem->type) {
+        case ElementType::FrontMatter:
+            for (const auto& field : elem->metadata) {
+                out += toWide(field.first);
+                out += L": ";
+                out += toWide(field.second);
+                out += L"\n";
+            }
+            out += L"\n";
+            break;
         case ElementType::Text:
             out += toWide(elem->text);
             break;

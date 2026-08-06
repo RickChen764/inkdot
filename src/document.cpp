@@ -1,4 +1,5 @@
 #include "document.h"
+#include "front_matter.h"
 
 #include <chrono>
 #include <memory>
@@ -80,6 +81,33 @@ qmd::ParseResult createMermaidDocument(const std::string& content) {
     return result;
 }
 
+void shiftSourceOffsets(const qmd::ElementPtr& element, size_t amount) {
+    if (!element) return;
+    if (element->sourceOffset != SIZE_MAX) element->sourceOffset += amount;
+    for (const auto& child : element->children) shiftSourceOffsets(child, amount);
+}
+
+qmd::ParseResult parseMarkdownDocument(qmd::MarkdownParser& parser,
+                                       const std::string& content) {
+    auto frontMatter = qmd::parseFrontMatter(content);
+    if (!frontMatter.present) return parser.parse(content);
+
+    auto result = parser.parse(content.substr(frontMatter.bodyOffset));
+    if (!result.success || !result.root) return result;
+
+    shiftSourceOffsets(result.root, frontMatter.bodyOffset);
+    auto metadata = std::make_shared<qmd::Element>(qmd::ElementType::FrontMatter);
+    metadata->sourceOffset = 0;
+    metadata->text = std::move(frontMatter.raw);
+    metadata->error = std::move(frontMatter.error);
+    for (auto& field : frontMatter.fields) {
+        metadata->metadata.push_back({std::move(field.key), std::move(field.value)});
+    }
+    metadata->parent = result.root.get();
+    result.root->children.insert(result.root->children.begin(), std::move(metadata));
+    return result;
+}
+
 } // namespace
 
 bool isMermaidDocumentPath(std::string_view path) {
@@ -106,12 +134,12 @@ qmd::ParseResult parseDocument(qmd::MarkdownParser& parser,
                                const std::string& content,
                                std::string_view path) {
     if (isMermaidDocumentPath(path)) return createMermaidDocument(content);
-    return parser.parse(content);
+    return parseMarkdownDocument(parser, content);
 }
 
 qmd::ParseResult parseDocument(qmd::MarkdownParser& parser,
                                const std::string& content,
                                std::wstring_view path) {
     if (isMermaidDocumentPath(path)) return createMermaidDocument(content);
-    return parser.parse(content);
+    return parseMarkdownDocument(parser, content);
 }

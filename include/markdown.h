@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <utility>
 
 namespace qmd {
 
@@ -13,6 +14,7 @@ namespace qmd {
 enum class ElementType {
     Document,
     // Block elements
+    FrontMatter,
     Paragraph,
     Heading,
     CodeBlock,
@@ -61,6 +63,8 @@ struct Element {
     int col_count = 0;        // for tables (number of columns)
     int alertKind = 0;        // for blockquotes: GitHub alert (0=none, 1=note, 2=tip,
                               // 3=important, 4=warning, 5=caution)
+    std::vector<std::pair<std::string, std::string>> metadata; // YAML Front Matter fields
+    std::string error;        // non-fatal parse error for rendered metadata
 
     size_t sourceOffset = SIZE_MAX; // byte offset in original markdown source
 

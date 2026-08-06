@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- YAML Front Matter: leading `---` metadata renders as a compact native card, with mappings, sequences, nested/flow values, quoted strings, comments, and block scalars supported without adding a runtime dependency
+- Invalid Front Matter displays a readable parse error and the original YAML while the Markdown body continues to render and remains editable
+
 ## [v2.4.5] - 2026-08-05
 
 ### Added
