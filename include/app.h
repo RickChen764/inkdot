@@ -247,6 +247,11 @@ struct App {
     bool showHelp = false;
     float helpAnimation = 0.0f;
     float helpScroll = 0.0f;
+    // Two complete Ctrl taps (with no intervening chord) toggle shortcut help.
+    bool ctrlTapCandidate = false;
+    bool hasPreviousCtrlTap = false;
+    std::chrono::steady_clock::time_point ctrlPressTime;
+    std::chrono::steady_clock::time_point previousCtrlTapTime;
     float helpContentHeight = 0.0f;   // Total content height (set during render)
     float helpVisibleHeight = 0.0f;   // Visible area height (set during render)
     float helpScrollbarTop = 0.0f;    // Scrollbar track top Y (set during render)

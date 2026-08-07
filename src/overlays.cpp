@@ -890,14 +890,18 @@ void renderHelpOverlay(App& app) {
         {L"Tab",          uiText(UiText::ToggleContents)},
         {L"T",            uiText(UiText::ThemeChooser)},
         {L"S",            uiText(UiText::ToggleStats)},
-        {L"?",            uiText(UiText::ThisHelp)},
+        {L"Ctrl Ctrl / ?", uiText(UiText::ThisHelp)},
     };
 
     const HelpEntry editEntries[] = {
-        {L":",             uiText(UiText::EnterEditMode)},
+        {L"Ctrl+E",        uiText(UiText::EnterEditMode)},
         {L"Ctrl+S",       uiText(UiText::SaveEditMode)},
         {L"Ctrl+P",       uiText(UiText::TogglePreview)},
         {L"Ctrl+W",       uiText(UiText::ToggleWordWrap)},
+        {L"Ctrl+Z",       uiText(UiText::Undo)},
+        {L"Ctrl+Y",       uiText(UiText::Redo)},
+        {L"Ctrl+X",       uiText(UiText::CutSelection)},
+        {L"Ctrl+V",       uiText(UiText::Paste)},
         {L"ESC ESC",      uiText(UiText::ExitEditMode)},
     };
 
@@ -922,7 +926,7 @@ void renderHelpOverlay(App& app) {
         return lineH + sectionHeaderExtra + entryCount * lineH + sectionGap;
     };
     float footerH = dpi(app, 35.0f);
-    float totalContentHeight = sectionHeight(6) + sectionHeight(7) + sectionHeight(5) + sectionHeight(4) + footerH;
+    float totalContentHeight = sectionHeight(6) + sectionHeight(7) + sectionHeight(9) + sectionHeight(4) + footerH;
 
     // Scrollable area
     float contentTopY = titleBottomY + dpi(app, 10.0f);
@@ -975,7 +979,7 @@ void renderHelpOverlay(App& app) {
 
     drawSection(uiText(UiText::NavigationSection), navEntries, 6);
     drawSection(uiText(UiText::ViewSection), overlayEntries, 7);
-    drawSection(uiText(UiText::EditingSection), editEntries, 5);
+    drawSection(uiText(UiText::EditingSection), editEntries, 9);
     drawSection(uiText(UiText::GeneralSection), generalEntries, 4);
 
     // Footer hint

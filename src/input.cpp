@@ -981,6 +981,17 @@ void handleKeyDown(App& app, HWND hwnd, WPARAM wParam) {
     float maxScroll = std::max(0.0f, app.contentHeight - app.height);
     bool ctrl = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
 
+    // Shortcut help is modal, including in edit mode. This prevents typing
+    // behind the panel while it is open. Double-Ctrl is handled in WndProc.
+    if (app.showHelp) {
+        if (wParam == VK_ESCAPE) {
+            app.showHelp = false;
+            app.helpAnimation = 0;
+            InvalidateRect(hwnd, nullptr, FALSE);
+        }
+        return;
+    }
+
     // Edit mode: Ctrl+C with preview pane selection should copy from preview
     if (app.editMode) {
         if (ctrl && wParam == 'C' && app.hasSelection && !app.selectedText.empty()) {
@@ -1077,6 +1088,14 @@ void handleKeyDown(App& app, HWND hwnd, WPARAM wParam) {
 
     if (ctrl) {
         switch (wParam) {
+            case 'E':
+                // Input-method-independent edit shortcut. Keep ':' as a
+                // legacy alternative in WM_CHAR for existing users.
+                if (!app.showSearch && !app.showThemeChooser &&
+                    !app.showFolderBrowser && !app.showToc) {
+                    enterEditMode(app);
+                }
+                return;
             case 'A': {
                 // Select All - extract all text from document
                 if (app.root) {
@@ -1258,7 +1277,18 @@ void handleKeyDown(App& app, HWND hwnd, WPARAM wParam) {
 }
 
 void handleCharInput(App& app, HWND hwnd, WPARAM wParam) {
-    // Edit mode: ':' enters edit mode, otherwise route to editor
+    // Shortcut help is modal, including in edit mode. '?' closes it without
+    // inserting a character into the editor or another text input.
+    if (app.showHelp) {
+        if ((wchar_t)wParam == L'?') {
+            app.showHelp = false;
+            app.helpAnimation = 0;
+            InvalidateRect(hwnd, nullptr, FALSE);
+        }
+        return;
+    }
+
+    // In edit mode, route printable input to the editor.
     if (app.editMode) {
         handleEditorCharInput(app, hwnd, wParam);
         return;

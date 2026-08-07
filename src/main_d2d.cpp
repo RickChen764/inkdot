@@ -780,7 +780,7 @@ render_document:
     if (app.showFolderBrowser) renderFolderBrowser(app);
     if (app.showToc) renderToc(app);
     if (app.showThemeChooser) renderThemeChooser(app);
-    if (app.showHelp) renderHelpOverlay(app);
+    if (app.showHelp && !app.editMode) renderHelpOverlay(app);
 
     // Close edit mode split view clipping
     if (app.editMode) {
@@ -793,6 +793,11 @@ render_document:
 
         // Render edit mode notification (on top of everything)
         renderEditModeNotification(app);
+
+        // Help is a full-window modal overlay. Draw it only after the preview
+        // clip and transform have been removed, otherwise it is confined to
+        // the right-hand preview pane in edit mode.
+        if (app.showHelp) renderHelpOverlay(app);
     }
 
     // "Saved!" notification (reuses "Copied!" infrastructure)
@@ -802,6 +807,10 @@ render_document:
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     App* app = g_app;
+
+    auto isCtrlKey = [](WPARAM key) {
+        return key == VK_CONTROL || key == VK_LCONTROL || key == VK_RCONTROL;
+    };
 
     switch (msg) {
         case WM_SIZE:
@@ -870,8 +879,54 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             break;
 
         case WM_KEYDOWN:
-            if (app) handleKeyDown(*app, hwnd, wParam);
+            if (app) {
+                // Bit 30 is set for keyboard auto-repeat. Only a fresh Ctrl
+                // press can begin a tap, and any chord cancels that tap.
+                bool wasAlreadyDown = (lParam & (1LL << 30)) != 0;
+                if (isCtrlKey(wParam)) {
+                    if (!wasAlreadyDown) {
+                        app->ctrlTapCandidate = true;
+                        app->ctrlPressTime = std::chrono::steady_clock::now();
+                    }
+                } else {
+                    // Any intervening key means the previous Ctrl press was
+                    // not part of a clean double tap (for example Ctrl+E).
+                    if (app->ctrlTapCandidate) app->ctrlTapCandidate = false;
+                    app->hasPreviousCtrlTap = false;
+                }
+                handleKeyDown(*app, hwnd, wParam);
+            }
             return 0;
+
+        case WM_KEYUP:
+            if (app && isCtrlKey(wParam)) {
+                if (app->ctrlTapCandidate) {
+                    auto now = std::chrono::steady_clock::now();
+                    auto held = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        now - app->ctrlPressTime).count();
+                    bool isDoubleTap = false;
+                    if (held <= 350 && app->hasPreviousCtrlTap) {
+                        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            now - app->previousCtrlTapTime).count();
+                        isDoubleTap = elapsed <= 500;
+                    }
+                    if (isDoubleTap) {
+                        app->showHelp = !app->showHelp;
+                        app->helpAnimation = 0;
+                        app->helpScroll = 0;
+                        app->hasPreviousCtrlTap = false;
+                        InvalidateRect(hwnd, nullptr, FALSE);
+                    } else if (held <= 350) {
+                        app->previousCtrlTapTime = now;
+                        app->hasPreviousCtrlTap = true;
+                    } else {
+                        app->hasPreviousCtrlTap = false;
+                    }
+                }
+                app->ctrlTapCandidate = false;
+                return 0;
+            }
+            break;
 
         case WM_CHAR:
             if (app) handleCharInput(*app, hwnd, wParam);
