@@ -1,5 +1,5 @@
-#ifndef TINTA_RENDER_H
-#define TINTA_RENDER_H
+#ifndef INKDOT_RENDER_H
+#define INKDOT_RENDER_H
 
 #include "app.h"
 
@@ -21,4 +21,4 @@ void ensureLayoutComplete(App& app);
 // AsyncImageResult, updates the image cache, and triggers a reflow
 void completeAsyncImage(App& app, void* asyncResult);
 
-#endif // TINTA_RENDER_H
+#endif // INKDOT_RENDER_H

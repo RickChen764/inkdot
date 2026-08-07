@@ -1,5 +1,5 @@
-#ifndef TINTA_UTILS_H
-#define TINTA_UTILS_H
+#ifndef INKDOT_UTILS_H
+#define INKDOT_UTILS_H
 
 #include "app.h"
 #include <string>
@@ -37,4 +37,4 @@ void scrollToHeadingY(App& app, float headingY);
 bool scrollToHeadingId(App& app, const std::string& id);
 void handleLinkClick(App& app);
 
-#endif // TINTA_UTILS_H
+#endif // INKDOT_UTILS_H

@@ -1,5 +1,5 @@
-#ifndef TINTA_LOCALIZATION_H
-#define TINTA_LOCALIZATION_H
+#ifndef INKDOT_LOCALIZATION_H
+#define INKDOT_LOCALIZATION_H
 
 #include <string>
 
@@ -94,4 +94,4 @@ const wchar_t* localizedThemeName(int themeIndex);
 const char* localizedSampleMarkdown();
 std::wstring localizeFrontMatterError(const std::string& error);
 
-#endif // TINTA_LOCALIZATION_H
+#endif // INKDOT_LOCALIZATION_H

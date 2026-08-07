@@ -1059,7 +1059,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wc.hIcon = LoadIconW(hInstance, L"IDI_ICON1");
     wc.hIconSm = LoadIconW(hInstance, L"IDI_ICON1");
-    wc.lpszClassName = L"Tinta";
+    wc.lpszClassName = L"Inkdot";
     RegisterClassExW(&wc);
 
     // Validate the saved window position against the monitors that exist
@@ -1091,8 +1091,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
 
     app.hwnd = CreateWindowExW(
         WS_EX_ACCEPTFILES,
-        L"Tinta",
-        L"Tinta",
+        L"Inkdot",
+        L"墨点 Inkdot",
         WS_OVERLAPPEDWINDOW,
         windowX, windowY,
         savedSettings.windowWidth, savedSettings.windowHeight,

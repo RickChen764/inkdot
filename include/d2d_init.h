@@ -1,5 +1,5 @@
-#ifndef TINTA_D2D_INIT_H
-#define TINTA_D2D_INIT_H
+#ifndef INKDOT_D2D_INIT_H
+#define INKDOT_D2D_INIT_H
 
 #include "app.h"
 
@@ -11,4 +11,4 @@ void ensureThemePreviewFormats(App& app);
 void createTypography(App& app);
 bool createRenderTarget(App& app);
 
-#endif // TINTA_D2D_INIT_H
+#endif // INKDOT_D2D_INIT_H

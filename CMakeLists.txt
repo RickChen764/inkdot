@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(tinta VERSION 2.4.5 LANGUAGES C CXX)
+project(inkdot VERSION 2.4.5 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -78,18 +78,18 @@ set(HEADERS
 
 # Windows resource file (icon)
 set(RESOURCES
-    resources/tinta.rc
+    resources/inkdot.rc
 )
 
 # Main executable
-add_executable(tinta WIN32 ${SOURCES} ${HEADERS} ${RESOURCES})
+add_executable(inkdot WIN32 ${SOURCES} ${HEADERS} ${RESOURCES})
 
-target_include_directories(tinta PRIVATE
+target_include_directories(inkdot PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${md4c_SOURCE_DIR}/src
 )
 
-target_link_libraries(tinta PRIVATE
+target_link_libraries(inkdot PRIVATE
     md4c
     d2d1
     dwrite
@@ -101,10 +101,10 @@ target_link_libraries(tinta PRIVATE
     d3d11
 )
 
-target_compile_definitions(tinta PRIVATE UNICODE _UNICODE
-    TINTA_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
-    TINTA_VERSION_MINOR=${PROJECT_VERSION_MINOR}
-    TINTA_VERSION_PATCH=${PROJECT_VERSION_PATCH})
+target_compile_definitions(inkdot PRIVATE UNICODE _UNICODE
+    INKDOT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
+    INKDOT_VERSION_MINOR=${PROJECT_VERSION_MINOR}
+    INKDOT_VERSION_PATCH=${PROJECT_VERSION_PATCH})
 
 if(BUILD_TESTING)
     add_executable(mermaid_tests
@@ -163,4 +163,4 @@ if(BUILD_TESTING)
 endif()
 
 # Install
-install(TARGETS tinta RUNTIME DESTINATION bin)
+install(TARGETS inkdot RUNTIME DESTINATION bin)

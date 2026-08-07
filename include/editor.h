@@ -1,5 +1,5 @@
-#ifndef TINTA_EDITOR_H
-#define TINTA_EDITOR_H
+#ifndef INKDOT_EDITOR_H
+#define INKDOT_EDITOR_H
 
 #include "app.h"
 #include <windows.h>
@@ -37,4 +37,4 @@ void rebuildLineStarts(App& app);
 size_t editorTopVisibleLine(App& app);
 std::string toUtf8(const std::wstring& wstr);
 
-#endif // TINTA_EDITOR_H
+#endif // INKDOT_EDITOR_H

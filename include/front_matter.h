@@ -1,5 +1,5 @@
-#ifndef TINTA_FRONT_MATTER_H
-#define TINTA_FRONT_MATTER_H
+#ifndef INKDOT_FRONT_MATTER_H
+#define INKDOT_FRONT_MATTER_H
 
 #include <cstddef>
 #include <string>
@@ -29,4 +29,4 @@ FrontMatterResult parseFrontMatter(const std::string& markdown);
 
 } // namespace qmd
 
-#endif // TINTA_FRONT_MATTER_H
+#endif // INKDOT_FRONT_MATTER_H

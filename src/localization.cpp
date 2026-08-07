@@ -78,20 +78,20 @@ constexpr Translation TRANSLATIONS[] = {
     {L"image", L"图片"},
     {L"YAML error: ", L"YAML 解析错误："},
     {L"No metadata fields", L"没有元数据字段"},
-    {L"Tinta - File Association", L"Tinta - 文件关联"},
-    {L"Would you like to set Tinta as the default viewer for Markdown and Mermaid files?\n\nWindows will open Settings where you can select Tinta.",
-     L"是否将 Tinta 设为 Markdown 和 Mermaid 文件的默认阅读器？\n\nWindows 将打开“设置”，你可以在其中选择 Tinta。"},
-    {L"Failed to add the .mmd file association. Run tinta.exe /register to try again.",
-     L"添加 .mmd 文件关联失败。请运行 tinta.exe /register 重试。"},
-    {L"Tinta has been registered.\n\nIn the Settings window that opens:\n1. Search for '.md' or '.mmd'\n2. Click on the current default app\n3. Select 'Tinta' from the list",
-     L"Tinta 已注册。\n\n请在随后打开的“设置”窗口中：\n1. 搜索“.md”或“.mmd”\n2. 点击当前的默认应用\n3. 从列表中选择“Tinta”"},
+    {L"Inkdot - File Association", L"墨点 - 文件关联"},
+    {L"Would you like to set Inkdot as the default viewer for Markdown and Mermaid files?\n\nWindows will open Settings where you can select Inkdot.",
+     L"是否将墨点设为 Markdown 和 Mermaid 文件的默认阅读器？\n\nWindows 将打开“设置”，你可以在其中选择墨点。"},
+    {L"Failed to add the .mmd file association. Run inkdot.exe /register to try again.",
+     L"添加 .mmd 文件关联失败。请运行 inkdot.exe /register 重试。"},
+    {L"Inkdot has been registered.\n\nIn the Settings window that opens:\n1. Search for '.md' or '.mmd'\n2. Click on the current default app\n3. Select 'Inkdot' from the list",
+     L"墨点已注册。\n\n请在随后打开的“设置”窗口中：\n1. 搜索“.md”或“.mmd”\n2. 点击当前的默认应用\n3. 从列表中选择“墨点 Inkdot”"},
     {L"Almost done!", L"即将完成！"},
     {L"Failed to register file association. Try running as administrator.",
      L"注册文件关联失败。请尝试以管理员身份运行。"},
     {L"Error", L"错误"},
     {L"Failed to initialize Direct2D", L"Direct2D 初始化失败"},
     {L"Failed to create render target", L"创建渲染目标失败"},
-    {L"Tinta Document", L"Tinta 文档"},
+    {L"Inkdot Document", L"墨点文档"},
     {L"A fast, lightweight Markdown and Mermaid reader", L"快速轻量的 Markdown 与 Mermaid 阅读器"},
 };
 
@@ -178,9 +178,9 @@ const wchar_t* localizedThemeName(int themeIndex) {
 }
 
 const char* localizedSampleMarkdown() {
-    static constexpr const char* english = R"(# Welcome to Tinta
+    static constexpr const char* english = R"(# Welcome to Inkdot
 
-**Tinta** is a fast, lightweight Markdown and Mermaid viewer for Windows.
+**Inkdot** is a fast, lightweight Markdown and Mermaid viewer for Windows.
 
 ## Getting Started
 
@@ -196,9 +196,9 @@ const char* localizedSampleMarkdown() {
 - Table of contents — press **Tab**
 - 10 themes — press **T** to choose
 )";
-    static constexpr const char* chinese = u8R"(# 欢迎使用 Tinta
+    static constexpr const char* chinese = u8R"(# 欢迎使用墨点
 
-**Tinta** 是一款适用于 Windows 的快速、轻量 Markdown 与 Mermaid 阅读器。
+**墨点 Inkdot** 是一款适用于 Windows 的快速、轻量 Markdown 与 Mermaid 阅读器。
 
 ## 快速开始
 

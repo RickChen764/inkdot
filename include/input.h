@@ -1,5 +1,5 @@
-#ifndef TINTA_INPUT_H
-#define TINTA_INPUT_H
+#ifndef INKDOT_INPUT_H
+#define INKDOT_INPUT_H
 
 #include "app.h"
 #include <windows.h>
@@ -14,4 +14,4 @@ void handleCharInput(App& app, HWND hwnd, WPARAM wParam);
 void handleDropFiles(App& app, HWND hwnd, WPARAM wParam);
 void handleFileWatchTimer(App& app, HWND hwnd);
 
-#endif // TINTA_INPUT_H
+#endif // INKDOT_INPUT_H

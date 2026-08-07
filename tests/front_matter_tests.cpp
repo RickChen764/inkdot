@@ -27,7 +27,7 @@ int main() {
     {
         std::string source =
             "---\n"
-            "title: \"Tinta notes\"\n"
+            "title: \"Inkdot notes\"\n"
             "draft: false # publishing state\n"
             "tags: [markdown, Windows, \"C++\"]\n"
             "author:\n"
@@ -54,7 +54,7 @@ int main() {
               "raw YAML preserves quotes, comments, order, and indentation for rendering");
         check(result.bodyOffset == source.find("# Body"), "body offset points after closing delimiter");
         check(result.fields.size() == 7, "top-level mapping becomes seven fields");
-        check(field(result, "title") && field(result, "title")->value == "Tinta notes",
+        check(field(result, "title") && field(result, "title")->value == "Inkdot notes",
               "quoted scalar is unquoted");
         check(field(result, "draft") && field(result, "draft")->value == "false",
               "comments are removed from plain scalars");

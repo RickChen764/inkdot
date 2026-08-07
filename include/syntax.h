@@ -1,5 +1,5 @@
-#ifndef TINTA_SYNTAX_H
-#define TINTA_SYNTAX_H
+#ifndef INKDOT_SYNTAX_H
+#define INKDOT_SYNTAX_H
 
 #include "app.h"
 #include <vector>
@@ -30,4 +30,4 @@ const std::unordered_set<std::wstring>* getKeywordsForLanguage(int lang);
 std::vector<SyntaxToken> tokenizeLine(const std::wstring& line, int language, bool& inBlockComment);
 D2D1_COLOR_F getTokenColor(const D2DTheme& theme, SyntaxTokenType ttype);
 
-#endif // TINTA_SYNTAX_H
+#endif // INKDOT_SYNTAX_H

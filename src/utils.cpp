@@ -132,14 +132,14 @@ void findLineRects(const App& app, float y, float& lineLeft, float& lineRight,
 }
 
 void updateWindowTitle(App& app) {
-    std::wstring title = L"Tinta";
+    std::wstring title = L"墨点 Inkdot";
     if (!app.currentFile.empty()) {
         std::wstring wpath = toWide(app.currentFile);
         size_t lastSep = wpath.find_last_of(L"\\/");
         if (lastSep != std::wstring::npos)
-            title = L"Tinta - " + wpath.substr(lastSep + 1);
+            title = L"墨点 Inkdot - " + wpath.substr(lastSep + 1);
         else
-            title = L"Tinta - " + wpath;
+            title = L"墨点 Inkdot - " + wpath;
     }
     SetWindowTextW(app.hwnd, title.c_str());
 }

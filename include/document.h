@@ -1,5 +1,5 @@
-#ifndef TINTA_DOCUMENT_H
-#define TINTA_DOCUMENT_H
+#ifndef INKDOT_DOCUMENT_H
+#define INKDOT_DOCUMENT_H
 
 #include "markdown.h"
 
@@ -26,4 +26,4 @@ qmd::ParseResult parseDocument(qmd::MarkdownParser& parser,
                                const std::string& content,
                                std::wstring_view path);
 
-#endif // TINTA_DOCUMENT_H
+#endif // INKDOT_DOCUMENT_H

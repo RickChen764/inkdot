@@ -1,5 +1,5 @@
-#ifndef TINTA_MARKDOWN_H
-#define TINTA_MARKDOWN_H
+#ifndef INKDOT_MARKDOWN_H
+#define INKDOT_MARKDOWN_H
 
 #include "types.h"
 #include <string>
@@ -117,4 +117,4 @@ void parseHtmlIntoElements(const std::string& html, Element* parent);
 
 } // namespace qmd
 
-#endif // TINTA_MARKDOWN_H
+#endif // INKDOT_MARKDOWN_H

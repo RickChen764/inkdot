@@ -1,5 +1,5 @@
-#ifndef TINTA_SETTINGS_H
-#define TINTA_SETTINGS_H
+#ifndef INKDOT_SETTINGS_H
+#define INKDOT_SETTINGS_H
 
 #include "app.h"
 
@@ -10,4 +10,4 @@ bool registerFileAssociation();
 void openDefaultAppsSettings();
 void askAndRegisterFileAssociation(Settings& settings);
 
-#endif // TINTA_SETTINGS_H
+#endif // INKDOT_SETTINGS_H

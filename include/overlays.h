@@ -1,5 +1,5 @@
-#ifndef TINTA_OVERLAYS_H
-#define TINTA_OVERLAYS_H
+#ifndef INKDOT_OVERLAYS_H
+#define INKDOT_OVERLAYS_H
 
 #include "app.h"
 
@@ -9,4 +9,4 @@ void renderToc(App& app);
 void renderThemeChooser(App& app);
 void renderHelpOverlay(App& app);
 
-#endif // TINTA_OVERLAYS_H
+#endif // INKDOT_OVERLAYS_H

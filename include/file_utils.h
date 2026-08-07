@@ -1,5 +1,5 @@
-#ifndef TINTA_FILE_UTILS_H
-#define TINTA_FILE_UTILS_H
+#ifndef INKDOT_FILE_UTILS_H
+#define INKDOT_FILE_UTILS_H
 
 #include "app.h"
 #include <string>
@@ -12,4 +12,4 @@ std::wstring getParentPath(const std::wstring& path);
 std::wstring getDirectoryFromFile(const std::string& filePath);
 void populateFolderItems(App& app);
 
-#endif // TINTA_FILE_UTILS_H
+#endif // INKDOT_FILE_UTILS_H

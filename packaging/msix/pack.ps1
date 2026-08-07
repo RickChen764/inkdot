@@ -1,13 +1,13 @@
 # Builds an unsigned MSIX for Microsoft Store submission (the Store signs it).
-# Usage: pwsh packaging/msix/pack.ps1 [-ExePath <path\to\tinta.exe>] [-OutDir <dir>]
+# Usage: pwsh packaging/msix/pack.ps1 [-ExePath <path\to\inkdot.exe>] [-OutDir <dir>]
 param(
-    [string]$ExePath = "$PSScriptRoot\..\..\build\Release\tinta.exe",
+    [string]$ExePath = "$PSScriptRoot\..\..\build\Release\inkdot.exe",
     [string]$OutDir = "$PSScriptRoot\out"
 )
 
 $ErrorActionPreference = "Stop"
 
-if (-not (Test-Path $ExePath)) { throw "tinta.exe not found at $ExePath — build Release first" }
+if (-not (Test-Path $ExePath)) { throw "inkdot.exe not found at $ExePath — build Release first" }
 
 # Version from CMakeLists project() VERSION, padded to 4 parts (Store requires x.y.z.0)
 $cmake = Get-Content "$PSScriptRoot\..\..\CMakeLists.txt" -Raw
@@ -20,7 +20,7 @@ New-Item -ItemType Directory -Force "$staging\Assets" | Out-Null
 
 Copy-Item $ExePath $staging
 Copy-Item "$PSScriptRoot\Assets\*" "$staging\Assets"
-(Get-Content "$PSScriptRoot\AppxManifest.xml" -Raw) -replace 'TINTA_MSIX_VERSION', $version |
+(Get-Content "$PSScriptRoot\AppxManifest.xml" -Raw) -replace 'INKDOT_MSIX_VERSION', $version |
     Set-Content "$staging\AppxManifest.xml" -Encoding utf8
 
 $sdkBin = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.*\x64\makeappx.exe" |
@@ -36,7 +36,7 @@ if ($LASTEXITCODE -ne 0) { throw "makepri createconfig failed" }
 & $makepri new /pr $staging /cf $priconfig /of "$staging\resources.pri" /mn "$staging\AppxManifest.xml" /o
 if ($LASTEXITCODE -ne 0) { throw "makepri new failed" }
 
-$msix = Join-Path $OutDir "tinta-$version.msix"
+$msix = Join-Path $OutDir "inkdot-$version.msix"
 if (Test-Path $msix) { Remove-Item -Force $msix }
 & $makeappx pack /d $staging /p $msix /o
 if ($LASTEXITCODE -ne 0) { throw "makeappx failed with exit code $LASTEXITCODE" }

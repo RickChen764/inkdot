@@ -1,5 +1,5 @@
-#ifndef TINTA_MERMAID_H
-#define TINTA_MERMAID_H
+#ifndef INKDOT_MERMAID_H
+#define INKDOT_MERMAID_H
 
 #include <cstddef>
 #include <cstdint>
@@ -99,4 +99,4 @@ Layout layout(const Diagram& diagram, const std::vector<Size>& nodeSizes,
 
 } // namespace mermaid
 
-#endif // TINTA_MERMAID_H
+#endif // INKDOT_MERMAID_H

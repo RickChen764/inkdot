@@ -560,7 +560,7 @@ static void scheduleReparse(App& app) {
         std::wstring wpath = toWide(app.currentFile);
         size_t lastSep = wpath.find_last_of(L"\\/");
         std::wstring fname = (lastSep != std::wstring::npos) ? wpath.substr(lastSep + 1) : wpath;
-        std::wstring title = L"Tinta - * " + fname;
+        std::wstring title = L"墨点 Inkdot - * " + fname;
         SetWindowTextW(app.hwnd, title.c_str());
     }
     // No preview pane — nothing to keep in sync until it's shown again

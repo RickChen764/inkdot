@@ -1,5 +1,5 @@
-#ifndef TINTA_TYPES_H
-#define TINTA_TYPES_H
+#ifndef INKDOT_TYPES_H
+#define INKDOT_TYPES_H
 
 #include <cstdint>
 #include <string>
@@ -99,4 +99,4 @@ struct Theme {
 
 } // namespace qmd
 
-#endif // TINTA_TYPES_H
+#endif // INKDOT_TYPES_H

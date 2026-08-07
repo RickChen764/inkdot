@@ -1,5 +1,5 @@
-#ifndef TINTA_INLINE_STYLE_H
-#define TINTA_INLINE_STYLE_H
+#ifndef INKDOT_INLINE_STYLE_H
+#define INKDOT_INLINE_STYLE_H
 
 #include "app.h"
 
@@ -44,4 +44,4 @@ void flattenInline(App& app, const std::vector<ElementPtr>& elements,
                    const InlineStyle& inherited, float lineHeight,
                    std::vector<StyledRun>& out);
 
-#endif // TINTA_INLINE_STYLE_H
+#endif // INKDOT_INLINE_STYLE_H

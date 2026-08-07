@@ -1,5 +1,5 @@
-#ifndef TINTA_APP_H
-#define TINTA_APP_H
+#ifndef INKDOT_APP_H
+#define INKDOT_APP_H
 
 #define WIN32_LEAN_AND_MEAN
 #ifndef NOMINMAX
@@ -650,4 +650,4 @@ inline void startNotificationTimer(App& app) {
     if (app.hwnd) SetTimer(app.hwnd, TIMER_NOTIFICATION, 33, nullptr);
 }
 
-#endif // TINTA_APP_H
+#endif // INKDOT_APP_H
