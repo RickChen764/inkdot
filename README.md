@@ -14,6 +14,8 @@
 
 墨点使用 Windows 原生 Direct2D/DirectWrite 渲染，不携带浏览器内核。它启动迅速、保持单文件分发，并在 Tinta 的轻盈体验上加入 YAML Front Matter 渲染和中英文界面。
 
+应用图标采用一枚真实书法侧点：露锋入纸、顿笔蓄墨，保留宣纸上的自然渗化与枯笔纹理。
+
 ## 下载
 
 从 [Releases](https://github.com/RickChen764/inkdot/releases/latest) 下载便携版 `inkdot.exe`，无需安装。首次发布前也可以按下文从源码构建。
