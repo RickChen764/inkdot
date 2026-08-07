@@ -251,12 +251,9 @@ void extractText(const ElementPtr& elem, std::wstring& out) {
 
     switch (elem->type) {
         case ElementType::FrontMatter:
-            for (const auto& field : elem->metadata) {
-                out += toWide(field.first);
-                out += L": ";
-                out += toWide(field.second);
-                out += L"\n";
-            }
+            // Match the card: preserve field order, quotes, comments, and
+            // indentation instead of copying the normalized parser model.
+            out += toWide(elem->text);
             out += L"\n";
             break;
         case ElementType::Text:

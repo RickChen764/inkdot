@@ -19,6 +19,7 @@
 #include <thread>
 #include "settings.h"
 #include "document.h"
+#include "localization.h"
 #include "d2d_init.h"
 #include "utils.h"
 #include "syntax.h"
@@ -464,7 +465,8 @@ render_document:
                 app.theme.isDark ? 0.9f : 0.15f,
                 1.0f));
             IDWriteTextLayout* btnLayout = nullptr;
-            app.dwriteFactory->CreateTextLayout(L"Copy", 4, app.codeFormat,
+            const wchar_t* copyLabel = uiText(UiText::Copy);
+            app.dwriteFactory->CreateTextLayout(copyLabel, (UINT32)wcslen(copyLabel), app.codeFormat,
                 btnW, btnH, &btnLayout);
             if (btnLayout) {
                 btnLayout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
@@ -721,7 +723,8 @@ render_document:
             static IDWriteTextLayout* cachedCopyLayout = nullptr;
             static float cachedTextOffsetX = 0, cachedTextOffsetY = 0;
             if (!cachedCopyLayout) {
-                app.dwriteFactory->CreateTextLayout(L"Copied!", 7,
+                const wchar_t* copiedLabel = uiText(UiText::Copied);
+                app.dwriteFactory->CreateTextLayout(copiedLabel, (UINT32)wcslen(copiedLabel),
                     app.textFormat, copyWidth, copyHeight, &cachedCopyLayout);
                 if (cachedCopyLayout) {
                     DWRITE_TEXT_METRICS m;
@@ -746,8 +749,7 @@ render_document:
     if (app.showStats) {
         wchar_t stats[512];
         swprintf(stats, 512,
-            L"Parse: %zu us | Layout: %zu us | Draw calls: %zu\n"
-            L"Startup: %.1fms (Win: %.1f | D2D: %.1f | DWrite: %.1f | File: %.1f)",
+            uiText(UiText::StatsFormat),
             app.parseTimeUs,
             app.layoutTimeUs,
             app.drawCalls,
@@ -979,74 +981,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
-static const char* sampleMarkdown = R"(# Welcome to Tinta
-
-**Tinta** is a fast, lightweight Markdown and Mermaid viewer for Windows.
-
-## Getting Started
-
-- **Drag & drop** a `.md` or `.mmd` file onto this window
-- Press **B** to browse and open files from a folder
-- Or run `tinta.exe readme.md` from the command line
-- Press **?** for all available keyboard shortcuts
-
-## Features
-
-- 10 beautiful themes — press **T** to choose
-- Native Mermaid flowchart rendering for `.mmd` files
-- Edit mode with live preview — press **:**
-- Search — press **F**
-- Table of contents — press **Tab**
-- Text selection and copy
-- Syntax highlighting in code blocks for C/C++, C#, Python, JavaScript, Rust, Go, and Bash
-
-## Code Example
-
-```cpp
-int main() {
-    printf("Hello, World!\n");
-    return 0;
-}
-```
-
-## Keyboard Shortcuts
-
-Press **?** at any time to see all shortcuts.
-
-### Navigation
-
-- **J / K** - Scroll down / up
-- **Space / PgDn** - Page down
-- **PgUp** - Page up
-- **Home / End** - Jump to start / end
-- **Ctrl+Scroll** - Zoom in / out
-
-### View
-
-- **F** or **Ctrl+F** - Search
-- **Enter** - Next search match
-- **B** - Toggle folder browser
-- **Tab** - Toggle table of contents
-- **T** - Theme chooser
-- **S** - Toggle stats
-
-### Editing
-
-- **:** - Enter edit mode
-- **Ctrl+S** - Save (in edit mode)
-- **ESC ESC** - Exit edit mode
-
-### General
-
-- **Ctrl+A** - Select all
-- **Ctrl+C** - Copy selection
-- **ESC** - Close overlay / Quit
-- **Q** - Quit
-)";
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow) {
     // Enable per-monitor DPI V2 awareness
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+    initializeLocalization();
 
     auto startupStart = Clock::now();
 
@@ -1091,16 +1029,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
     if (forceRegister) {
         if (registerFileAssociation()) {
             MessageBoxW(nullptr,
-                       L"Tinta has been registered.\n\n"
-                       L"In the Settings window that opens:\n"
-                       L"1. Search for '.md' or '.mmd'\n"
-                       L"2. Click on the current default app\n"
-                       L"3. Select 'Tinta' from the list",
-                       L"Almost done!", MB_OK | MB_ICONINFORMATION);
+                       uiText(UiText::RegisteredInstructions),
+                       uiText(UiText::AlmostDone), MB_OK | MB_ICONINFORMATION);
             openDefaultAppsSettings();
         } else {
-            MessageBoxW(nullptr, L"Failed to register file association. Try running as administrator.",
-                       L"Error", MB_OK | MB_ICONWARNING);
+            MessageBoxW(nullptr, uiText(UiText::RegisterFailed),
+                       uiText(UiText::ErrorTitle), MB_OK | MB_ICONWARNING);
         }
         return 0;  // Exit after registering
     }
@@ -1172,7 +1106,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
 
     // Initialize D2D
     if (!initD2D(app)) {
-        MessageBoxW(nullptr, L"Failed to initialize Direct2D", L"Error", MB_OK);
+        MessageBoxW(nullptr, uiText(UiText::Direct2DInitFailed), uiText(UiText::ErrorTitle), MB_OK);
         return 1;
     }
 
@@ -1189,7 +1123,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
     // Create render target
     t0 = Clock::now();
     if (!createRenderTarget(app)) {
-        MessageBoxW(nullptr, L"Failed to create render target", L"Error", MB_OK);
+        MessageBoxW(nullptr, uiText(UiText::RenderTargetFailed), uiText(UiText::ErrorTitle), MB_OK);
         return 1;
     }
     app.metrics.renderTargetUs = usElapsed(t0);
@@ -1221,14 +1155,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
             app.currentFile = inputFile;
             app.focusMermaidOnNextLayout = isMermaidDocumentPath(inputFile);
         } else {
-            loadDocumentContent(sampleMarkdown, {});
+            loadDocumentContent(localizedSampleMarkdown(), {});
         }
     } else {
         // Try syntax.md
         if (loadFile("syntax.md")) {
             app.currentFile = "syntax.md";
         } else {
-            loadDocumentContent(sampleMarkdown, {});
+            loadDocumentContent(localizedSampleMarkdown(), {});
         }
     }
 

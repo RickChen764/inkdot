@@ -1,6 +1,7 @@
 #include "overlays.h"
 #include "utils.h"
 #include "d2d_init.h"
+#include "localization.h"
 
 #include <chrono>
 #include <algorithm>
@@ -78,7 +79,8 @@ void renderSearchOverlay(App& app) {
             D2D1_COLOR_F placeholderColor = app.theme.text;
             placeholderColor.a = 0.4f * anim;
             app.brush->SetColor(placeholderColor);
-            app.renderTarget->DrawText(L"Search...", 9, searchTextFormat,
+            const wchar_t* placeholder = uiText(UiText::SearchPlaceholder);
+            app.renderTarget->DrawText(placeholder, (UINT32)wcslen(placeholder), searchTextFormat,
                 D2D1::RectF(textX, barY + dpi(app, 12.0f), textX + textWidth, barY + barHeight), app.brush);
         } else {
             // Actual search query
@@ -116,11 +118,11 @@ void renderSearchOverlay(App& app) {
             size_t matchCount = app.editMode ? app.editorSearchMatches.size() : app.searchMatches.size();
             int currentIdx = app.editMode ? app.editorSearchCurrentIndex : app.searchCurrentIndex;
             if (matchCount == 0) {
-                wcscpy_s(countText, L"No matches");
+                wcscpy_s(countText, uiText(UiText::NoMatches));
                 // Red color for no matches
                 app.brush->SetColor(D2D1::ColorF(0.9f, 0.3f, 0.3f, anim));
             } else {
-                swprintf_s(countText, L"%d of %zu", currentIdx + 1, matchCount);
+                swprintf_s(countText, uiText(UiText::MatchCountFormat), currentIdx + 1, matchCount);
                 D2D1_COLOR_F countColor = app.theme.text;
                 countColor.a = 0.7f * anim;
                 app.brush->SetColor(countColor);
@@ -521,7 +523,8 @@ void renderToc(App& app) {
         D2D1_COLOR_F headerColor = app.theme.heading;
         headerColor.a = anim;
         app.brush->SetColor(headerColor);
-        app.renderTarget->DrawText(L"Contents", 8, tocBold,
+        const wchar_t* contents = uiText(UiText::Contents);
+        app.renderTarget->DrawText(contents, (UINT32)wcslen(contents), tocBold,
             D2D1::RectF(panelX + padding, headerY, panelX + panelWidth - padding, headerY + headerHeight),
             app.brush);
 
@@ -542,7 +545,8 @@ void renderToc(App& app) {
             D2D1_COLOR_F dimColor = app.theme.text;
             dimColor.a = 0.5f * anim;
             app.brush->SetColor(dimColor);
-            app.renderTarget->DrawText(L"No headings", 11, tocNormal,
+            const wchar_t* noHeadings = uiText(UiText::NoHeadings);
+            app.renderTarget->DrawText(noHeadings, (UINT32)wcslen(noHeadings), tocNormal,
                 D2D1::RectF(panelX + padding, listStartY + dpi(app, 8.0f), panelX + panelWidth - padding, listStartY + dpi(app, 40.0f)),
                 app.brush);
         } else {
@@ -662,7 +666,8 @@ void renderThemeChooser(App& app) {
     if (titleFormat) {
         titleFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
         app.brush->SetColor(D2D1::ColorF(1, 1, 1, anim));
-        app.renderTarget->DrawText(L"Choose Theme", 12, titleFormat,
+        const wchar_t* chooseTheme = uiText(UiText::ChooseTheme);
+        app.renderTarget->DrawText(chooseTheme, (UINT32)wcslen(chooseTheme), titleFormat,
             D2D1::RectF(panelX, panelY + dpi(app, 15.0f), panelX + panelWidth, panelY + dpi(app, 55.0f)), app.brush);
     }
 
@@ -726,7 +731,8 @@ void renderThemeChooser(App& app) {
             D2D1_COLOR_F nameColor = t.heading;
             nameColor.a = anim;
             app.brush->SetColor(nameColor);
-            app.renderTarget->DrawText(t.name, (UINT32)wcslen(t.name), nameFormat,
+            const wchar_t* themeName = localizedThemeName(i);
+            app.renderTarget->DrawText(themeName, (UINT32)wcslen(themeName), nameFormat,
                 D2D1::RectF(innerX + dpi(app, 12.0f), innerY + dpi(app, 8.0f), innerX + innerW - dpi(app, 10.0f), innerY + dpi(app, 28.0f)), app.brush);
         }
 
@@ -738,14 +744,16 @@ void renderThemeChooser(App& app) {
             D2D1_COLOR_F textColor = t.text;
             textColor.a = anim;
             app.brush->SetColor(textColor);
-            app.renderTarget->DrawText(L"The quick brown fox", 19, previewFormat,
+            const wchar_t* previewSample = uiText(UiText::ThemePreviewSample);
+            app.renderTarget->DrawText(previewSample, (UINT32)wcslen(previewSample), previewFormat,
                 D2D1::RectF(innerX + dpi(app, 12.0f), innerY + dpi(app, 30.0f), innerX + innerW - dpi(app, 10.0f), innerY + dpi(app, 45.0f)), app.brush);
 
             // Link sample
             D2D1_COLOR_F linkColor = t.link;
             linkColor.a = anim;
             app.brush->SetColor(linkColor);
-            app.renderTarget->DrawText(L"hyperlink", 9, previewFormat,
+            const wchar_t* hyperlink = uiText(UiText::Hyperlink);
+            app.renderTarget->DrawText(hyperlink, (UINT32)wcslen(hyperlink), previewFormat,
                 D2D1::RectF(innerX + dpi(app, 12.0f), innerY + dpi(app, 44.0f), innerX + dpi(app, 80.0f), innerY + dpi(app, 58.0f)), app.brush);
 
             // Code sample background
@@ -802,11 +810,13 @@ void renderThemeChooser(App& app) {
         app.brush->SetColor(D2D1::ColorF(0.5f, 0.5f, 0.5f, anim));
 
         // Light themes header
-        app.renderTarget->DrawText(L"LIGHT THEMES", 12, headerFormat,
+        const wchar_t* lightThemes = uiText(UiText::LightThemes);
+        app.renderTarget->DrawText(lightThemes, (UINT32)wcslen(lightThemes), headerFormat,
             D2D1::RectF(panelX + dpi(app, 20.0f), gridStartY - dpi(app, 20.0f), panelX + dpi(app, 20.0f) + cardWidth, gridStartY - dpi(app, 5.0f)), app.brush);
 
         // Dark themes header
-        app.renderTarget->DrawText(L"DARK THEMES", 11, headerFormat,
+        const wchar_t* darkThemes = uiText(UiText::DarkThemes);
+        app.renderTarget->DrawText(darkThemes, (UINT32)wcslen(darkThemes), headerFormat,
             D2D1::RectF(panelX + dpi(app, 40.0f) + cardWidth, gridStartY - dpi(app, 20.0f), panelX + dpi(app, 40.0f) + cardWidth * 2, gridStartY - dpi(app, 5.0f)), app.brush);
     }
 }
@@ -849,7 +859,8 @@ void renderHelpOverlay(App& app) {
     if (titleFormat) {
         titleFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
         app.brush->SetColor(D2D1::ColorF(1, 1, 1, anim));
-        app.renderTarget->DrawText(L"Keyboard Shortcuts", 18, titleFormat,
+        const wchar_t* shortcuts = uiText(UiText::KeyboardShortcuts);
+        app.renderTarget->DrawText(shortcuts, (UINT32)wcslen(shortcuts), titleFormat,
             D2D1::RectF(panelX, panelY + dpi(app, 15.0f), panelX + panelWidth, titleBottomY), app.brush);
     }
 
@@ -864,37 +875,37 @@ void renderHelpOverlay(App& app) {
     };
 
     const HelpEntry navEntries[] = {
-        {L"J / \x2193",   L"Scroll down"},
-        {L"K / \x2191",   L"Scroll up"},
-        {L"Space / PgDn", L"Page down"},
-        {L"PgUp",         L"Page up"},
-        {L"Home / End",   L"Jump to start / end"},
-        {L"Ctrl+Scroll",  L"Zoom in / out"},
+        {L"J / \x2193",   uiText(UiText::ScrollDown)},
+        {L"K / \x2191",   uiText(UiText::ScrollUp)},
+        {L"Space / PgDn", uiText(UiText::PageDown)},
+        {L"PgUp",         uiText(UiText::PageUp)},
+        {L"Home / End",   uiText(UiText::JumpStartEnd)},
+        {L"Ctrl+Scroll",  uiText(UiText::ZoomInOut)},
     };
 
     const HelpEntry overlayEntries[] = {
-        {L"F / Ctrl+F",   L"Search"},
-        {L"Enter",        L"Next search match"},
-        {L"B",            L"Toggle folder browser"},
-        {L"Tab",          L"Toggle table of contents"},
-        {L"T",            L"Theme chooser"},
-        {L"S",            L"Toggle stats"},
-        {L"?",            L"This help"},
+        {L"F / Ctrl+F",   uiText(UiText::Search)},
+        {L"Enter",        uiText(UiText::NextSearchMatch)},
+        {L"B",            uiText(UiText::ToggleFolderBrowser)},
+        {L"Tab",          uiText(UiText::ToggleContents)},
+        {L"T",            uiText(UiText::ThemeChooser)},
+        {L"S",            uiText(UiText::ToggleStats)},
+        {L"?",            uiText(UiText::ThisHelp)},
     };
 
     const HelpEntry editEntries[] = {
-        {L":",             L"Enter edit mode"},
-        {L"Ctrl+S",       L"Save (in edit mode)"},
-        {L"Ctrl+P",       L"Show / hide preview pane"},
-        {L"Ctrl+W",       L"Toggle word wrap"},
-        {L"ESC ESC",      L"Exit edit mode"},
+        {L":",             uiText(UiText::EnterEditMode)},
+        {L"Ctrl+S",       uiText(UiText::SaveEditMode)},
+        {L"Ctrl+P",       uiText(UiText::TogglePreview)},
+        {L"Ctrl+W",       uiText(UiText::ToggleWordWrap)},
+        {L"ESC ESC",      uiText(UiText::ExitEditMode)},
     };
 
     const HelpEntry generalEntries[] = {
-        {L"Ctrl+A",       L"Select all text"},
-        {L"Ctrl+C",       L"Copy selection"},
-        {L"ESC",          L"Close overlay / Quit"},
-        {L"Q",            L"Quit"},
+        {L"Ctrl+A",       uiText(UiText::SelectAllText)},
+        {L"Ctrl+C",       uiText(UiText::CopySelection)},
+        {L"ESC",          uiText(UiText::CloseOverlayQuit)},
+        {L"Q",            uiText(UiText::Quit)},
     };
 
     float padding = dpi(app, 20.0f);
@@ -911,7 +922,7 @@ void renderHelpOverlay(App& app) {
         return lineH + sectionHeaderExtra + entryCount * lineH + sectionGap;
     };
     float footerH = dpi(app, 35.0f);
-    float totalContentHeight = sectionHeight(6) + sectionHeight(7) + sectionHeight(3) + sectionHeight(4) + footerH;
+    float totalContentHeight = sectionHeight(6) + sectionHeight(7) + sectionHeight(5) + sectionHeight(4) + footerH;
 
     // Scrollable area
     float contentTopY = titleBottomY + dpi(app, 10.0f);
@@ -962,15 +973,16 @@ void renderHelpOverlay(App& app) {
         y += sectionGap;
     };
 
-    drawSection(L"NAVIGATION", navEntries, 6);
-    drawSection(L"VIEW", overlayEntries, 7);
-    drawSection(L"EDITING", editEntries, 3);
-    drawSection(L"GENERAL", generalEntries, 4);
+    drawSection(uiText(UiText::NavigationSection), navEntries, 6);
+    drawSection(uiText(UiText::ViewSection), overlayEntries, 7);
+    drawSection(uiText(UiText::EditingSection), editEntries, 5);
+    drawSection(uiText(UiText::GeneralSection), generalEntries, 4);
 
     // Footer hint
     normalFmt->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     app.brush->SetColor(D2D1::ColorF(0.5f, 0.5f, 0.5f, anim));
-    app.renderTarget->DrawText(L"Press ESC or ? to close", 23, normalFmt,
+    const wchar_t* closeHint = uiText(UiText::CloseHelpHint);
+    app.renderTarget->DrawText(closeHint, (UINT32)wcslen(closeHint), normalFmt,
         D2D1::RectF(panelX, y, panelX + panelWidth, y + lineH), app.brush);
 
     app.renderTarget->PopAxisAlignedClip();

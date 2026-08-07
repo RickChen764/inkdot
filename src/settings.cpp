@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "document.h"
+#include "localization.h"
 
 #include <windows.h>
 #include <shlobj.h>
@@ -127,7 +128,7 @@ bool registerFileAssociation() {
     result = RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\Classes\\Tinta.MarkdownFile", 0, nullptr,
                               REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr);
     if (result != ERROR_SUCCESS) return false;
-    const wchar_t* desc = L"Tinta Document";
+    const wchar_t* desc = uiText(UiText::DocumentDescription);
     RegSetValueExW(hKey, nullptr, 0, REG_SZ, (BYTE*)desc, (DWORD)((wcslen(desc) + 1) * sizeof(wchar_t)));
     RegCloseKey(hKey);
 
@@ -155,7 +156,7 @@ bool registerFileAssociation() {
                               REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr);
     if (result != ERROR_SUCCESS) return false;
     const wchar_t* appName = L"Tinta";
-    const wchar_t* appDesc = L"A fast, lightweight Markdown and Mermaid reader";
+    const wchar_t* appDesc = uiText(UiText::ApplicationDescription);
     RegSetValueExW(hKey, L"ApplicationName", 0, REG_SZ, (BYTE*)appName, (DWORD)((wcslen(appName) + 1) * sizeof(wchar_t)));
     RegSetValueExW(hKey, L"ApplicationDescription", 0, REG_SZ, (BYTE*)appDesc, (DWORD)((wcslen(appDesc) + 1) * sizeof(wchar_t)));
     RegCloseKey(hKey);
@@ -214,8 +215,8 @@ void askAndRegisterFileAssociation(Settings& settings) {
             !registerFileAssociation()) {
             MessageBoxW(
                 nullptr,
-                L"Failed to add the .mmd file association. Run tinta.exe /register to try again.",
-                L"Tinta - File Association",
+                uiText(UiText::FileAssociationAddedFailed),
+                uiText(UiText::FileAssociationTitle),
                 MB_OK | MB_ICONWARNING);
         }
         return;
@@ -223,25 +224,20 @@ void askAndRegisterFileAssociation(Settings& settings) {
 
     int result = MessageBoxW(
         nullptr,
-        L"Would you like to set Tinta as the default viewer for Markdown and Mermaid files?\n\n"
-        L"Windows will open Settings where you can select Tinta.",
-        L"Tinta - File Association",
+        uiText(UiText::FileAssociationQuestion),
+        uiText(UiText::FileAssociationTitle),
         MB_YESNO | MB_ICONQUESTION
     );
 
     if (result == IDYES) {
         if (registerFileAssociation()) {
             MessageBoxW(nullptr,
-                       L"Tinta has been registered.\n\n"
-                       L"In the Settings window that opens:\n"
-                       L"1. Search for '.md' or '.mmd'\n"
-                       L"2. Click on the current default app\n"
-                       L"3. Select 'Tinta' from the list",
-                       L"Almost done!", MB_OK | MB_ICONINFORMATION);
+                       uiText(UiText::RegisteredInstructions),
+                       uiText(UiText::AlmostDone), MB_OK | MB_ICONINFORMATION);
             openDefaultAppsSettings();
         } else {
-            MessageBoxW(nullptr, L"Failed to register file association. Try running as administrator.",
-                       L"Error", MB_OK | MB_ICONWARNING);
+            MessageBoxW(nullptr, uiText(UiText::RegisterFailed),
+                       uiText(UiText::ErrorTitle), MB_OK | MB_ICONWARNING);
         }
     }
 

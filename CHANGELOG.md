@@ -5,6 +5,10 @@
 ### Added
 - YAML Front Matter: leading `---` metadata renders as a compact native card, with mappings, sequences, nested/flow values, quoted strings, comments, and block scalars supported without adding a runtime dependency
 - Invalid Front Matter displays a readable parse error and the original YAML while the Markdown body continues to render and remains editable
+- Simplified Chinese interface selected automatically from the Windows UI language, covering overlays, editing notifications, file association dialogs, alerts, stats, and the welcome document; unsupported system languages fall back to English
+
+### Changed
+- Front Matter cards now follow a compact code-block style: the original YAML, including quotes, order, and indentation, is rendered in a theme-aware monospace panel
 
 ## [v2.4.5] - 2026-08-05
 

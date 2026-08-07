@@ -4,6 +4,7 @@
 #include "syntax.h"
 #include "search.h"
 #include "mermaid.h"
+#include "localization.h"
 
 #include <algorithm>
 #include <cctype>
@@ -250,7 +251,7 @@ public:
     }
     HRESULT STDMETHODCALLTYPE GetLocaleName(UINT32 position, UINT32* textLength,
                                             const WCHAR** localeName) override {
-        *localeName = L"en-us";
+        *localeName = uiLocaleName();
         *textLength = length_ - position;
         return S_OK;
     }
@@ -742,109 +743,68 @@ static void layoutHeading(App& app, const ElementPtr& elem, float& y, float inde
     y += 12 * scale;
 }
 
-static std::vector<ElementPtr> plainTextElements(const std::string& text) {
-    auto element = std::make_shared<Element>(ElementType::Text);
-    element->text = text;
-    return {std::move(element)};
-}
-
-static void layoutPlainLines(App& app, const std::string& text,
-                             float x, float& y, float width,
-                             IDWriteTextFormat* format, D2D1_COLOR_F color,
-                             float lineHeight) {
-    size_t start = 0;
-    while (start <= text.size()) {
-        size_t end = text.find('\n', start);
-        if (end == std::string::npos) end = text.size();
-        if (end > start) {
-            layoutInlineContent(app, plainTextElements(text.substr(start, end - start)),
-                                x, y, width, format, color, {}, lineHeight);
-        } else {
-            y += lineHeight;
-        }
-        if (end == text.size()) break;
-        start = end + 1;
-    }
-}
-
 static void layoutFrontMatter(App& app, const ElementPtr& elem,
                               float& y, float indent, float maxWidth) {
     float scale = app.contentScale * app.zoomFactor;
-    float padding = 14.0f * scale;
-    float lineHeight = app.textFormat->GetFontSize() * 1.55f;
-    float titleHeight = lineHeight + 8.0f * scale;
+    float paddingX = 16.0f * scale;
+    float paddingY = 14.0f * scale;
+    float lineHeight = 20.0f * scale;
     float cardTop = y;
-    float contentX = indent + padding;
-    float contentWidth = std::max(40.0f * scale, maxWidth - padding * 2.0f);
+    float contentX = indent + paddingX;
 
     D2D1_COLOR_F fill = app.theme.codeBackground;
-    fill.a = app.theme.isDark ? 0.52f : 0.66f;
+    fill.a = app.theme.isDark ? 0.72f : 0.78f;
     D2D1_COLOR_F border = app.theme.blockquoteBorder;
-    border.a = 0.75f;
-    D2D1_COLOR_F muted = app.theme.text;
-    muted.a = 0.72f;
+    border.a = 0.34f;
 
-    std::wstring title = L"YAML Front Matter";
-    LayoutInfo titleLayout = createLayout(
-        app, title, app.boldFormat, titleHeight, app.bodyTypography);
-    addTextRun(app, std::move(titleLayout), D2D1::Point2F(contentX, y + padding),
-               D2D1::RectF(contentX, y + padding,
-                           contentX + contentWidth, y + padding + titleHeight),
-               app.theme.accent, 0, 0, false);
-    y += padding + titleHeight;
-
+    std::wstring raw = toWide(elem->text);
+    if (raw.empty()) raw = uiText(UiText::EmptyFrontMatter);
     if (!elem->error.empty()) {
-        D2D1_COLOR_F errorColor = hexColor(app.theme.isDark ? 0xF85149 : 0xCF222E);
-        layoutPlainLines(app, "YAML error: " + elem->error,
-                         contentX, y, contentWidth, app.boldFormat, errorColor, lineHeight);
-        if (!elem->text.empty()) {
-            y += 5.0f * scale;
-            layoutPlainLines(app, elem->text, contentX, y, contentWidth,
-                             app.codeFormat, muted, lineHeight);
-        }
-    } else if (elem->metadata.empty()) {
-        layoutPlainLines(app, "No metadata fields", contentX, y, contentWidth,
-                         app.italicFormat, muted, lineHeight);
-    } else {
-        float keyWidth = std::min(180.0f * scale, contentWidth * 0.30f);
-        keyWidth = std::max(88.0f * scale, keyWidth);
-        float valueX = contentX + keyWidth + 12.0f * scale;
-        float valueWidth = std::max(40.0f * scale, contentX + contentWidth - valueX);
-
-        for (size_t i = 0; i < elem->metadata.size(); i++) {
-            const auto& field = elem->metadata[i];
-            float keyY = y;
-            layoutPlainLines(app, field.first, contentX, keyY, keyWidth,
-                             app.boldFormat, app.theme.heading, lineHeight);
-            float valueY = y;
-            std::string value = field.second.empty() ? "\xE2\x80\x94" : field.second;
-            layoutPlainLines(app, value, valueX, valueY, valueWidth,
-                             app.textFormat, app.theme.text, lineHeight);
-            y = std::max(keyY, valueY) + 5.0f * scale;
-
-            if (i + 1 < elem->metadata.size()) {
-                D2D1_COLOR_F separator = border;
-                separator.a *= 0.5f;
-                app.layoutLines.push_back({
-                    D2D1::Point2F(contentX, y),
-                    D2D1::Point2F(contentX + contentWidth, y),
-                    separator, 1.0f * scale});
-                y += 6.0f * scale;
-            }
-        }
+        if (!raw.empty()) raw += L"\n\n";
+        raw += uiText(UiText::YamlErrorPrefix);
+        raw += localizeFrontMatterError(elem->error);
     }
 
-    y += padding;
+    int lineCount = 1;
+    for (wchar_t c : raw) if (c == L'\n') lineCount++;
+    float cardHeight = paddingY * 2 + lineCount * lineHeight;
     App::LayoutShape card;
     card.type = App::LayoutShapeType::RoundedRectangle;
-    card.rect = D2D1::RectF(indent, cardTop, indent + maxWidth, y);
+    card.rect = D2D1::RectF(indent, cardTop, indent + maxWidth, cardTop + cardHeight);
     card.fill = fill;
     card.stroke = border;
     card.strokeWidth = 1.0f * scale;
-    card.radius = 8.0f * scale;
+    card.radius = 4.0f * scale;
     app.layoutShapes.push_back(std::move(card));
+
+    size_t codeDocStart = app.docText.size();
+    size_t lineStart = 0;
+    float textY = cardTop + paddingY;
+    float maxLineWidth = 0.0f;
+    while (lineStart <= raw.size()) {
+        size_t lineEnd = raw.find(L'\n', lineStart);
+        if (lineEnd == std::wstring::npos) lineEnd = raw.size();
+        std::wstring_view line(raw.data() + lineStart, lineEnd - lineStart);
+        LayoutInfo info = createLayout(app, line, app.codeFormat, lineHeight, app.codeTypography);
+        float lineWidth = info.width;
+        D2D1_RECT_F bounds = D2D1::RectF(
+            contentX, textY, contentX + lineWidth, textY + lineHeight);
+        addTextRun(app, std::move(info), D2D1::Point2F(contentX, textY), bounds,
+                   app.theme.code, codeDocStart + lineStart, line.size(), !line.empty());
+        maxLineWidth = std::max(maxLineWidth, lineWidth);
+        textY += lineHeight;
+        if (lineEnd == raw.size()) break;
+        lineStart = lineEnd + 1;
+    }
+
+    float naturalWidth = maxLineWidth + paddingX * 2;
+    if (naturalWidth > maxWidth) {
+        app.layoutShapes.back().rect.right = indent + naturalWidth;
+        app.contentWidth = std::max(app.contentWidth, indent + naturalWidth);
+    }
+    app.docText += raw;
     app.docText += L"\n";
-    y += 16.0f * scale;
+    y = cardTop + cardHeight + 16.0f * scale;
 }
 
 static LayoutInfo createWrappedLayout(App& app, std::wstring_view text,
@@ -1504,15 +1464,15 @@ static void layoutBlockquote(App& app, const ElementPtr& elem, float& y, float i
     // GitHub alert callouts: accent-colored bar plus a bold title line.
     // Colors are github.com's light/dark alert accents, picked by theme.
     static const struct {
-        const wchar_t* title;
+        UiText title;
         uint32_t light;
         uint32_t dark;
     } ALERT_STYLES[] = {
-        {L"\u24D8  Note",            0x0969DA, 0x4493F8},  // circled info
-        {L"\U0001F4A1\uFE0E  Tip",   0x1A7F37, 0x3FB950},  // bulb, text presentation
-        {L"\u2757\uFE0E  Important", 0x8250DF, 0xAB7DF8},  // exclamation
-        {L"\u26A0\uFE0E  Warning",   0x9A6700, 0xD29922},  // warning triangle
-        {L"\u26D4\uFE0E  Caution",   0xCF222E, 0xF85149},  // no-entry
+        {UiText::AlertNote,      0x0969DA, 0x4493F8},
+        {UiText::AlertTip,       0x1A7F37, 0x3FB950},
+        {UiText::AlertImportant, 0x8250DF, 0xAB7DF8},
+        {UiText::AlertWarning,   0x9A6700, 0xD29922},
+        {UiText::AlertCaution,   0xCF222E, 0xF85149},
     };
 
     D2D1_COLOR_F barColor = app.theme.blockquoteBorder;
@@ -1520,7 +1480,11 @@ static void layoutBlockquote(App& app, const ElementPtr& elem, float& y, float i
         const auto& style = ALERT_STYLES[elem->alertKind - 1];
         barColor = hexColor(app.theme.isDark ? style.dark : style.light);
 
-        std::wstring title = style.title;
+        static constexpr const wchar_t* icons[] = {
+            L"\u24D8  ", L"\U0001F4A1\uFE0E  ", L"\u2757\uFE0E  ",
+            L"\u26A0\uFE0E  ", L"\u26D4\uFE0E  "};
+        std::wstring title = icons[elem->alertKind - 1];
+        title += uiText(style.title);
         LayoutInfo info = createLayout(app, title, app.textFormat, 24.0f, app.bodyTypography);
         if (info.layout) {
             DWRITE_TEXT_RANGE range = {0, (UINT32)title.length()};
@@ -1759,7 +1723,8 @@ static void layoutImage(App& app, const ElementPtr& elem, float& y, float indent
 
     if (entry.failed || !entry.bitmap) {
         // Render alt text as placeholder
-        std::wstring altText = L"[image";
+        std::wstring altText = L"[";
+        altText += uiText(UiText::ImagePlaceholder);
         std::wstring alt;
         std::function<void(const ElementPtr&)> extract = [&](const ElementPtr& e) {
             if (!e) return;

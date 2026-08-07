@@ -68,6 +68,7 @@ It's a viewer first: perfect as the double-click default for `.md` and `.mmd` fi
 - **Focused editing** - Hide the preview pane while writing (Ctrl+P)
 - **Native Mermaid flowcharts** - Render `.mmd` files and fenced `mermaid` blocks without a web engine
 - **YAML Front Matter** - Render document metadata as a native card instead of leaking it into the page
+- **Localized interface** - Simplified Chinese on Chinese Windows systems, with English fallback elsewhere
 - **Rich tables** - Tables with bold, italic, code, and clickable links in cells
 - **Folder browser** - Press B to browse and open Markdown or Mermaid files
 - **Table of contents** - Press Tab to see document headings, click to jump
@@ -166,7 +167,11 @@ draft: false
 ---
 ```
 
-The built-in lightweight parser supports the Front Matter syntax used by most static-site generators and note apps: mappings, lists, nested values, flow collections, quoted strings, comments, and `|`/`>` multiline text. It adds no runtime dependency. Invalid metadata is shown with a readable error while the Markdown body still renders and remains editable.
+The card preserves the original YAML formatting, field order, quotes, and indentation in a compact monospace block. The built-in lightweight parser validates the Front Matter syntax used by most static-site generators and note apps: mappings, lists, nested values, flow collections, quoted strings, comments, and `|`/`>` multiline text. It adds no runtime dependency. Invalid metadata is shown with a localized, readable error while the Markdown body still renders and remains editable.
+
+## Interface Language
+
+Tinta follows the Windows user interface language automatically. Chinese Windows systems display a Simplified Chinese interface; all other system languages fall back to English. This includes search, contents, themes, keyboard help, editing notifications, file-association dialogs, alerts, and the built-in welcome document.
 
 ## Themes
 

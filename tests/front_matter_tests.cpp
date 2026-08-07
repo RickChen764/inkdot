@@ -50,6 +50,8 @@ int main() {
         auto result = qmd::parseFrontMatter(source);
         check(result.present, "front matter is detected");
         check(result.error.empty(), "common YAML parses without an error");
+        check(result.raw == source.substr(4, source.find("\n---\n", 4) - 4),
+              "raw YAML preserves quotes, comments, order, and indentation for rendering");
         check(result.bodyOffset == source.find("# Body"), "body offset points after closing delimiter");
         check(result.fields.size() == 7, "top-level mapping becomes seven fields");
         check(field(result, "title") && field(result, "title")->value == "Tinta notes",

@@ -135,6 +135,8 @@ int main() {
               "front matter becomes its own renderable element");
         check(card->metadata.size() == 2 && card->metadata[0].first == "title",
               "parsed metadata fields are attached to the card");
+        check(card->text == "title: Test document\ntags: [one, two]",
+              "the card also retains original YAML formatting for display and copy");
         check(body->type == qmd::ElementType::Heading,
               "body starts with the real Markdown heading");
         check(body->sourceOffset >= yamlSource.find("Body heading"),

@@ -15,6 +15,7 @@ endif()
 # Compiler flags
 if(MSVC)
     add_compile_options(/W4)
+    add_compile_options(/utf-8)
     add_compile_options($<$<CONFIG:Release>:/O2>)
     add_compile_definitions(NOMINMAX _CRT_SECURE_NO_WARNINGS)
     # Static CRT: the exe must run on clean Windows installs without the
@@ -51,6 +52,7 @@ set(SOURCES
     src/document.cpp
     src/inline_style.cpp
     src/front_matter.cpp
+    src/localization.cpp
 )
 
 set(HEADERS
@@ -71,6 +73,7 @@ set(HEADERS
     include/document.h
     include/inline_style.h
     include/front_matter.h
+    include/localization.h
 )
 
 # Windows resource file (icon)
@@ -134,6 +137,15 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
     add_test(NAME front_matter_parser COMMAND front_matter_tests)
+
+    add_executable(localization_tests
+        tests/localization_tests.cpp
+        src/localization.cpp
+    )
+    target_include_directories(localization_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+    add_test(NAME localization COMMAND localization_tests)
 
     add_executable(inline_style_tests
         tests/inline_style_tests.cpp
