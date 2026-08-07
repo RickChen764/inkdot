@@ -40,7 +40,7 @@
 - 10 套浅色/深色主题、目录、文件夹浏览、拖放打开和文件监视
 - 简体中文/英文界面：跟随 Windows UI 语言自动选择
 - 原生文本选择、复制、内部锚点、GitHub Alerts 和常用行内扩展
-- 单个便携可执行文件，Release 构建目标体积低于 1 MiB
+- 单个便携可执行文件，Release 构建低于 1 MiB
 
 ## YAML Front Matter
 
@@ -117,7 +117,7 @@ ctest --test-dir build -C Release --output-on-failure
 pwsh tools/generate_brand_assets.ps1
 ```
 
-生成脚本以审核通过的 `resources/inkdot-source.png` 为源图，不会重新绘制书法笔触。
+生成脚本以审核通过的 `resources/inkdot-source.png` 为源图，不会重新绘制书法笔触。EXE 内嵌 16–128 像素多尺寸图标；256/300 像素高分辨率素材单独用于 MSIX 和仓库展示，以保持便携版低于 1 MiB。
 
 ## 上游项目与许可
 

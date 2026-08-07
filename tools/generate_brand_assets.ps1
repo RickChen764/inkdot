@@ -70,7 +70,7 @@ New-Item -ItemType Directory -Force $resourcesDir, $assetsDir | Out-Null
 
 Write-Bytes -Path (Join-Path $resourcesDir 'inkdot.png') -Bytes (New-InkdotPngBytes -Size 512)
 
-$iconSizes = @(16, 24, 32, 48, 64, 128, 256)
+$iconSizes = @(16, 24, 32, 48, 64, 128)
 $iconFrames = foreach ($size in $iconSizes) {
     [pscustomobject]@{ Size = $size; Bytes = (New-InkdotPngBytes -Size $size) }
 }
