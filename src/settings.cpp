@@ -53,8 +53,8 @@ Settings loadSettings() {
 
     std::ifstream file(path);
     if (!file) {
-        // One-time, read-only compatibility with settings from the original
-        // Tinta fork. The new file is written under %APPDATA%\Inkdot.
+        // One-time, read-only compatibility with the upstream Tinta settings.
+        // The new file is written under %APPDATA%\Inkdot.
         std::wstring legacyPath = settingsPathFor(L"Tinta", false);
         file.clear();
         file.open(legacyPath);

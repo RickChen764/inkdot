@@ -96,7 +96,7 @@ constexpr Translation TRANSLATIONS[] = {
     {L"Failed to initialize Direct2D", L"Direct2D 初始化失败"},
     {L"Failed to create render target", L"创建渲染目标失败"},
     {L"Inkdot Document", L"墨点文档"},
-    {L"A fast, lightweight Markdown and Mermaid reader", L"快速轻量的 Markdown 与 Mermaid 阅读器"},
+    {L"A tiny native Markdown and Mermaid reader and editor", L"极轻量的 Markdown 与 Mermaid 阅读/编辑器"},
 };
 
 static_assert(std::size(TRANSLATIONS) == static_cast<size_t>(UiText::ApplicationDescription) + 1,
@@ -184,7 +184,7 @@ const wchar_t* localizedThemeName(int themeIndex) {
 const char* localizedSampleMarkdown() {
     static constexpr const char* english = R"(# Welcome to Inkdot
 
-**Inkdot** is a fast, lightweight Markdown and Mermaid viewer for Windows.
+**Inkdot** is a tiny native Markdown and Mermaid reader and editor for Windows.
 
 ## Getting Started
 
@@ -202,7 +202,7 @@ const char* localizedSampleMarkdown() {
 )";
     static constexpr const char* chinese = u8R"(# 欢迎使用墨点
 
-**墨点 Inkdot** 是一款适用于 Windows 的快速、轻量 Markdown 与 Mermaid 阅读器。
+**墨点 Inkdot** 是一款适用于 Windows 的极轻量 Markdown 与 Mermaid 阅读/编辑器。
 
 ## 快速开始
 
@@ -213,7 +213,8 @@ const char* localizedSampleMarkdown() {
 ## 主要功能
 
 - 原生渲染 YAML Front Matter 和 Mermaid 图表
-- 带实时预览的编辑模式——按 **:** 进入
+- 带实时预览的编辑模式——按 **Ctrl+E** 进入
+- 完整快捷键面板——双击 **Ctrl** 打开
 - 搜索——按 **F**
 - 文章目录——按 **Tab**
 - 10 款主题——按 **T** 选择

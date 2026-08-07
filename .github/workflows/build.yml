@@ -28,31 +28,46 @@ jobs:
       - name: Get version from tag
         id: version
         shell: bash
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify tag matches CMake version
+        shell: pwsh
+        run: |
+          $cmake = Get-Content CMakeLists.txt -Raw
+          if ($cmake -notmatch 'project\([^)]*VERSION\s+(\d+\.\d+\.\d+)') {
+            throw 'VERSION not found in CMakeLists.txt'
+          }
+          $tagVersion = '${{ steps.version.outputs.VERSION }}'
+          if ($Matches[1] -ne $tagVersion) {
+            throw "Tag version $tagVersion does not match CMake version $($Matches[1])"
+          }
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: 墨点 Inkdot v${{ steps.version.outputs.VERSION }}
           body: |
             ## 墨点 Inkdot v${{ steps.version.outputs.VERSION }}
 
-            **Markdown, distilled.**
+            **轻落一笔，清爽阅读。**
 
-            A fast, lightweight Markdown and Mermaid reader for Windows.
+            墨点是适用于 Windows 的极轻量 Markdown 与 Mermaid 阅读/编辑器。
 
-            ### Installation
-            1. Download `inkdot.exe` below
-            2. Run it (you may need to click "More info" → "Run anyway" on SmartScreen)
-            3. Optionally run `inkdot.exe /register` to register Markdown and Mermaid files
+            ### 使用
+            1. 下载下方单文件便携版 `inkdot.exe`
+            2. 直接运行并打开 `.md`、`.markdown` 或 `.mmd` 文件
+            3. 按 `Ctrl+E` 编辑；双击 `Ctrl` 查看完整快捷键面板
+            4. 可选：运行 `inkdot.exe /register` 注册文件关联
 
-            ### What's included
-            - 10 beautiful themes (5 light, 5 dark)
-            - Hardware-accelerated rendering via Direct2D
-            - Native Mermaid flowchart rendering
-            - YAML Front Matter rendering
-            - Simplified Chinese UI on Chinese Windows systems
-            - Single portable executable under 1 MB, no dependencies
+            ### 本版亮点
+            - YAML Front Matter 原生渲染
+            - 简体中文/英文界面跟随 Windows 系统语言
+            - `Ctrl+E` 编辑与双击 `Ctrl` 快捷键面板
+            - Mermaid flowchart/graph 原生渲染
+            - Direct2D 硬件加速，单文件低于 1 MiB
+
+            > 便携版尚未进行代码签名，首次运行可能触发 Windows SmartScreen。
           files: build/Release/inkdot.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,6 +1,6 @@
-# Inkdot MSIX packaging & Microsoft Store publishing
+# 墨点 Inkdot MSIX packaging & Microsoft Store publishing
 
-Inkdot uses an independent package identity and is not associated with the
+墨点 Inkdot uses an independent package identity and is not associated with the
 original Tinta Microsoft Store listing. Reserve a new product in Partner
 Center and replace the placeholder `Identity` publisher values in
 `AppxManifest.xml` before submitting a package.

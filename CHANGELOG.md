@@ -2,13 +2,28 @@
 
 ## [Unreleased]
 
+## [v2.5.0] - 2026-08-07
+
 ### Added
 - YAML Front Matter: leading `---` metadata renders as a compact native card, with mappings, sequences, nested/flow values, quoted strings, comments, and block scalars supported without adding a runtime dependency
 - Invalid Front Matter displays a readable parse error and the original YAML while the Markdown body continues to render and remains editable
 - Simplified Chinese interface selected automatically from the Windows UI language, covering overlays, editing notifications, file association dialogs, alerts, stats, and the welcome document; unsupported system languages fall back to English
+- `Ctrl+E` enters edit mode independently of the active keyboard layout or input method
+- Double-tapping `Ctrl` opens a localized, scrollable shortcut panel in both viewer and editor modes
 
 ### Changed
 - Front Matter cards now follow a compact code-block style: the original YAML, including quotes, order, and indentation, is rendered in a theme-aware monospace panel
+- The fork is now branded as 墨点 Inkdot, with an independent executable name, settings directory, registry ProgID, MSIX identity, release assets, and calligraphic icon
+- Shortcut help is modal while open and now lists editing commands including undo, redo, cut, copy, and paste
+
+### Compatibility
+- Existing `%APPDATA%\Tinta\settings.ini` can be imported once when Inkdot has no settings yet; all subsequent settings and file associations remain independent
+
+---
+
+The entries below are the inherited release history of the upstream
+[Tinta](https://github.com/oipoistar/tinta) project. Store links and product
+names in those historical entries refer to Tinta, not Inkdot.
 
 ## [v2.4.5] - 2026-08-05
 

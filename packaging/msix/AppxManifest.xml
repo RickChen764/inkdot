@@ -13,7 +13,7 @@
 
   <Properties>
     <DisplayName>墨点 Inkdot</DisplayName>
-    <PublisherDisplayName>RickChen764</PublisherDisplayName>
+    <PublisherDisplayName>Inkdot contributors</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -34,14 +34,14 @@
     <Application Id="Inkdot" Executable="inkdot.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
           DisplayName="墨点 Inkdot"
-          Description="Tiny native Markdown and Mermaid reader and editor for Windows."
+          Description="墨点是一款适用于 Windows 的极轻量 Markdown 与 Mermaid 阅读/编辑器。"
           BackgroundColor="transparent"
           Square150x150Logo="Assets\Square150x150Logo.png"
           Square44x44Logo="Assets\Square44x44Logo.png" />
       <Extensions>
         <uap:Extension Category="windows.fileTypeAssociation">
           <uap:FileTypeAssociation Name="markdown">
-            <uap:DisplayName>Markdown Document</uap:DisplayName>
+            <uap:DisplayName>墨点 Markdown 文档</uap:DisplayName>
             <uap:Logo>Assets\Square44x44Logo.png</uap:Logo>
             <uap:SupportedFileTypes>
               <uap:FileType>.md</uap:FileType>
@@ -51,7 +51,7 @@
         </uap:Extension>
         <uap:Extension Category="windows.fileTypeAssociation">
           <uap:FileTypeAssociation Name="mermaid">
-            <uap:DisplayName>Mermaid Diagram</uap:DisplayName>
+            <uap:DisplayName>墨点 Mermaid 图表</uap:DisplayName>
             <uap:Logo>Assets\Square44x44Logo.png</uap:Logo>
             <uap:SupportedFileTypes>
               <uap:FileType>.mmd</uap:FileType>
