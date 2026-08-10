@@ -62,11 +62,11 @@ jobs:
             4. 可选：运行 `inkdot.exe /register` 注册文件关联
 
             ### 本版亮点
-            - YAML Front Matter 原生渲染
-            - 简体中文/英文界面跟随 Windows 系统语言
-            - `Ctrl+E` 编辑与双击 `Ctrl` 快捷键面板
-            - Mermaid flowchart/graph 原生渲染
-            - Direct2D 硬件加速，单文件低于 1 MiB
+            - 修复本地图片路径包含中文、CJK 或其他 Unicode 字符时可能闪退的问题
+            - 缺失、无效或编码异常的本地图片现在安全显示占位文字
+            - 支持百分号编码的 UTF-8 本地图片路径
+            - 修复启动阶段切换硬件渲染后本地图片变为占位文字的问题
+            - 保持 Direct2D 硬件加速与低于 1 MiB 的单文件便携体验
 
             > 便携版尚未进行代码签名，首次运行可能触发 Windows SmartScreen。
           files: build/Release/inkdot.exe

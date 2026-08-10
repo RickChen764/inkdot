@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(inkdot VERSION 2.5.0 LANGUAGES C CXX)
+project(inkdot VERSION 2.5.1 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -53,6 +53,7 @@ set(SOURCES
     src/inline_style.cpp
     src/front_matter.cpp
     src/localization.cpp
+    src/image_path.cpp
 )
 
 set(HEADERS
@@ -74,6 +75,7 @@ set(HEADERS
     include/inline_style.h
     include/front_matter.h
     include/localization.h
+    include/image_path.h
 )
 
 # Windows resource file (icon)
@@ -146,6 +148,16 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
     add_test(NAME localization COMMAND localization_tests)
+
+    add_executable(image_path_tests
+        tests/image_path_tests.cpp
+        src/image_path.cpp
+    )
+    target_include_directories(image_path_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+    target_compile_definitions(image_path_tests PRIVATE UNICODE _UNICODE)
+    add_test(NAME image_paths COMMAND image_path_tests)
 
     add_executable(inline_style_tests
         tests/inline_style_tests.cpp

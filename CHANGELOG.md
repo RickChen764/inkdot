@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [v2.5.1] - 2026-08-10
+
+### Fixed
+- Local image references containing Chinese, CJK, or other Unicode characters no longer terminate the app on Windows
+- Missing, malformed, or invalid UTF-8 local image paths now fall back to the normal image placeholder instead of crashing
+- Local images reload correctly after the startup renderer switches from the initial software target to the hardware target
+
+### Changed
+- Percent-encoded UTF-8 local image paths such as `%E5%B0%81%E9%9D%A2.png` are decoded before loading
+
 ## [v2.5.0] - 2026-08-07
 
 ### Added

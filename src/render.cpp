@@ -5,6 +5,7 @@
 #include "search.h"
 #include "mermaid.h"
 #include "localization.h"
+#include "image_path.h"
 
 #include <algorithm>
 #include <cctype>
@@ -12,7 +13,6 @@
 #include <functional>
 #include <limits>
 #include <string_view>
-#include <filesystem>
 #include <urlmon.h>
 #include <thread>
 #pragma comment(lib, "urlmon.lib")
@@ -1631,7 +1631,15 @@ static void asyncImageWorker(HWND hwnd, std::string src) {
 
 static App::ImageEntry& getOrLoadImage(App& app, const std::string& src) {
     auto it = app.imageCache.find(src);
-    if (it != app.imageCache.end()) return it->second;
+    if (it != app.imageCache.end()) {
+        // A render-target recreation releases target-bound D2D bitmaps.  Keep
+        // genuine cache results and in-flight downloads, but reload entries
+        // whose bitmap was invalidated during the software-to-GPU swap.
+        if (it->second.bitmap || it->second.failed || it->second.pending) {
+            return it->second;
+        }
+        app.imageCache.erase(it);
+    }
 
     App::ImageEntry entry;
     entry.failed = true;  // assume failure
@@ -1652,16 +1660,11 @@ static App::ImageEntry& getOrLoadImage(App& app, const std::string& src) {
         app.imageCache[src] = entry;
         std::thread(asyncImageWorker, app.hwnd, src).detach();
         return app.imageCache[src];
-    } else {
-        // Resolve relative to current file's directory
-        std::wstring wsrc = toWide(src);
-        if (!app.currentFile.empty()) {
-            std::filesystem::path basePath(app.currentFile);
-            std::filesystem::path imgPath = basePath.parent_path() / src;
-            widePath = imgPath.wstring();
-        } else {
-            widePath = wsrc;
-        }
+    } else if (!resolveLocalImagePath(app.currentFile, src, widePath)) {
+        // Invalid UTF-8, malformed escapes, and filesystem conversion errors
+        // render as the normal image placeholder instead of terminating.
+        app.imageCache[src] = entry;
+        return app.imageCache[src];
     }
 
     // Load via WIC
