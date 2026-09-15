@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [v2.5.2] - 2026-09-15
+
+### Added
+- `Ctrl+V` now pastes bitmap images from the Windows clipboard into the document directory and inserts a Markdown image reference
+
 ## [v2.5.1] - 2026-08-10
 
 ### Fixed

@@ -11,6 +11,8 @@
 #include <sstream>
 #include <algorithm>
 #include <chrono>
+#include <filesystem>
+#include <iomanip>
 #include <imm.h>
 
 #define TIMER_EDITOR_REPARSE 2
@@ -464,6 +466,66 @@ static std::wstring editorGetClipboard(HWND hwnd) {
         }
     }
     return result;
+}
+
+// Save a DIB copied by screenshots and graphics applications next to the
+// current Markdown document, then return a relative Markdown image reference.
+static bool editorPasteImage(App& app, HWND hwnd, std::wstring& markdown) {
+    if (app.currentFile.empty() || !OpenClipboard(hwnd)) return false;
+
+    HANDLE dataHandle = GetClipboardData(CF_DIBV5);
+    if (!dataHandle) dataHandle = GetClipboardData(CF_DIB);
+    if (!dataHandle) { CloseClipboard(); return false; }
+
+    SIZE_T dataSize = GlobalSize(dataHandle);
+    auto* data = static_cast<const BYTE*>(GlobalLock(dataHandle));
+    if (!data || dataSize < sizeof(BITMAPINFOHEADER)) {
+        if (data) GlobalUnlock(dataHandle);
+        CloseClipboard();
+        return false;
+    }
+
+    const auto* info = reinterpret_cast<const BITMAPINFOHEADER*>(data);
+    if (info->biSize < sizeof(BITMAPINFOHEADER) || info->biSize > dataSize ||
+        info->biWidth <= 0 || info->biHeight == 0 || info->biBitCount == 0) {
+        GlobalUnlock(dataHandle); CloseClipboard(); return false;
+    }
+    size_t colorTable = 0;
+    if (info->biBitCount <= 8) colorTable = (size_t(1) << info->biBitCount) * 4;
+    else if (info->biCompression == BI_BITFIELDS) colorTable = 12;
+    size_t pixelOffset = sizeof(BITMAPFILEHEADER) + info->biSize + colorTable;
+    if (info->biSize + colorTable > dataSize || pixelOffset > SIZE_MAX - (dataSize - info->biSize - colorTable)) {
+        GlobalUnlock(dataHandle); CloseClipboard(); return false;
+    }
+
+    std::filesystem::path documentPath(toWide(app.currentFile));
+    std::filesystem::path directory = documentPath.parent_path();
+    if (directory.empty()) directory = std::filesystem::current_path();
+    auto now = std::chrono::system_clock::now().time_since_epoch();
+    auto stamp = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+    std::filesystem::path imagePath;
+    for (int attempt = 0; attempt < 100; ++attempt) {
+        imagePath = directory / (L"image-" + std::to_wstring(stamp + attempt) + L".bmp");
+        if (!std::filesystem::exists(imagePath)) break;
+    }
+
+    BITMAPFILEHEADER fileHeader{};
+    fileHeader.bfType = 0x4D42;
+    fileHeader.bfOffBits = static_cast<DWORD>(pixelOffset);
+    fileHeader.bfSize = static_cast<DWORD>(pixelOffset + dataSize - info->biSize - colorTable);
+    std::ofstream out(imagePath, std::ios::binary);
+    bool saved = out.good();
+    if (saved) {
+        out.write(reinterpret_cast<const char*>(&fileHeader), sizeof(fileHeader));
+        out.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(dataSize));
+        saved = out.good();
+    }
+    GlobalUnlock(dataHandle);
+    CloseClipboard();
+    if (!saved) return false;
+
+    markdown = L"![图片](" + imagePath.filename().wstring() + L")";
+    return true;
 }
 
 // --- Scroll helpers ---
@@ -946,6 +1008,22 @@ void handleEditorKeyDown(App& app, HWND hwnd, WPARAM wParam) {
                 return;
             case 'V': {
                 std::wstring paste = editorGetClipboard(hwnd);
+                if (paste.empty()) {
+                    std::wstring imageMarkdown;
+                    if (editorPasteImage(app, hwnd, imageMarkdown)) {
+                        if (app.editorHasSelection) editorDeleteSelection(app);
+                        size_t before = app.editorCursorPos;
+                        app.editorText.insert(app.editorCursorPos, imageMarkdown);
+                        app.editorCursorPos += imageMarkdown.size();
+                        pushUndo(app, App::EditAction::Insert, before, imageMarkdown,
+                                 before, app.editorCursorPos);
+                        rebuildLineStarts(app);
+                        scheduleReparse(app);
+                        editorEnsureCursorVisible(app);
+                        InvalidateRect(hwnd, nullptr, FALSE);
+                    }
+                    return;
+                }
                 if (!paste.empty()) {
                     if (app.editorHasSelection) editorDeleteSelection(app);
                     size_t before = app.editorCursorPos;
