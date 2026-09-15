@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [v2.5.3] - 2026-09-15
+
+### Fixed
+- Theme selections are saved immediately when chosen and are restored on the next launch
+
 ## [v2.5.2] - 2026-09-15
 
 ### Added

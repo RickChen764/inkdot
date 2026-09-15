@@ -899,6 +899,11 @@ void handleMouseUp(App& app, HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         if (clickedTheme >= 0) {
             applyTheme(app, clickedTheme);
+            // Persist the selection immediately so it survives crashes,
+            // forced termination, and shutdown paths that bypass WM_DESTROY.
+            Settings settings = loadSettings();
+            settings.themeIndex = clickedTheme;
+            saveSettings(settings);
             app.showThemeChooser = false;
             app.themeChooserAnimation = 0;
         }
